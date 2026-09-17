@@ -189,7 +189,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // WS_EX_TOOLWINDOW: hide from taskbar
     // No WS_EX_TOPMOST -> window is not always-on-top
     HWND hWnd = CreateWindowExW(
-        WS_EX_TOOLWINDOW,
+        WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
         szWindowClass, L"",            // No title text (no help/info in title)
         WS_POPUP,
         100, 100, 70, 50, //dimensions
