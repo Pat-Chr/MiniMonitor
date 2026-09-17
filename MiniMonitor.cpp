@@ -1,40 +1,40 @@
 #include "framework.h"
 #include "MiniMonitor.h"
 #include <pdh.h>
-#include <pdhmsg.h>   // <-- Hinzugefügt: definiert PDH_MORE_DATA
+#include <pdhmsg.h>
 #include <string>
 #include <vector>
-#include <cmath> // Required for std::isfinite
+#include <cmath>
 #include <windows.h>
 #include <cstring>
 
-// Link the PDH library automatically
 #pragma comment(lib, "pdh.lib")
 
 #define MAX_LOADSTRING 100
 
-// Global Variables
+// Globale Instanzen und Fenstertexte
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 
-// Performance Counter Variables
+// PDH-Leistungszähler für CPU und GPU
 PDH_HQUERY cpuQuery;
 PDH_HCOUNTER cpuCounter;
 PDH_HQUERY gpuQuery;
-PDH_HCOUNTER gpuCounter; // This will hold the wildcard multi-instance counter
+PDH_HCOUNTER gpuCounter;
 
+// Aktuelle Lastwerte und Initialisierungsstatus
 float cpuLoad = 0.0f;
 float gpuLoad = 0.0f;
 bool firstSampleTaken = false;
 
-// Forward Declarations
+// Vorwärtsdeklarationen der Windows-Funktionen und Update-Funktion
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
 
-// Removes the menu and hides common toolbar/rebar/help controls in the window.
+// Versteckt Toolbars, ReBars und Statusleisten-Kinder im Fenster
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
 {
     char cls[64] = {0};
@@ -47,11 +47,8 @@ static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
     char txt[256] = {0};
     GetWindowTextA(child, txt, sizeof(txt));
     if (txt[0]) {
-        if (strstr(txt, "Help") || strstr(txt, "help") || strstr(txt, "Info") || strstr(txt, "info") || strstr(txt, "About") || strstr(txt, "about")) {
-            ShowWindow(child, SW_HIDE);
-        }
+        // Platz für zusätzliche Logik beim Erkennen von sichtbarem Text
     }
-
     return TRUE;
 }
 
