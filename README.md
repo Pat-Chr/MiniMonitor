@@ -28,8 +28,9 @@ C:XX% G:XX%
 
 ## Version Changelog
 - v1.0.2.0 — 2026-09-17
-  - Right click now opens an info window which will also be used for settings later. still shows the controls.
+	- Right click now opens an info window which will also be used for settings later. still shows the controls.
+	- Counts the amount of shown lines and adjusts window height automatcally.
 - v1.0.1.0 — 2026-09-17
-  - Better controls and right click explains them.
+	- Better controls and right click explains them.
 - v1.0.0.0 — 2026-09-17
-  - Initial release: borderless widget with CPU and GPU monitoring.
+	- Initial release: borderless widget with CPU and GPU monitoring.
