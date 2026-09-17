@@ -1,36 +1,44 @@
-# README.md
+# MiniMonitor
 
-MiniMonitor is a minimalist Windows desktop widget for real‑time CPU and GPU utilization monitoring. It displays values in a small borderless window with a dark background and neon green text.
+Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
-## Features
-- Minimal, borderless widget (Tool Window — does not appear in the taskbar)  
-- Real‑time updates every 500 ms  
-- Low resource usage via the PDH API (Performance Data Helper)  
-- Simple controls: drag to move, double‑click to exit, right click for info and settings (future)
+## 🚀 Features
+- **Minimalist Design**: Small, borderless window that stays out of your way.
+- **Low Overhead**: Uses Windows Performance Data Helper (PDH) API for efficient, low-resource monitoring.
+- **Real-time Updates**: Refreshes every 500ms.
+- **Non-Intrusive**: Uses `WS_EX_TOOLWINDOW` so it does not appear in the taskbar.
 
-## Display format
-C:XX% G:XX%
+## 🖥️ Display Format
+The widget displays current utilization in a stacked format:
+```text
+CPU:XX%
+GPU:XX%
+```
+*(Note: The current version may include a placeholder line for future metrics like RAM.)*
 
-- C: Total CPU processor time (%)  
-- G: Total GPU engine utilization (%)
+## 🖱️ Controls
+| Action | Result |
+| :--- | :--- |
+| **Left Click & Drag** | Move the widget around your screen |
+| **Double Click** | Close the widget |
+| **Right Click** | Open Info/Settings window |
 
-## Requirements
-- OS: Windows (required for WinAPI and PDH)  
-- IDE: Microsoft Visual Studio (Desktop Development with C++ recommended)  
-- Linker: pdh.lib (included via `#pragma comment(lib, "pdh.lib")`)
+## 🛠️ Technical Details
+- **Language**: C++
+- **API**: Win32 API, PDH (Performance Data Helper)
+- **Dependencies**: `pdh.lib` (linked via `#pragma comment`)
 
-## Build (Visual Studio)
-1. Create a new "Windows Desktop Application" project (or open an existing one).  
-2. Add source file(s) (e.g. `MiniMonitor.cpp`).  
-3. Ensure pdh.lib is linked (already referenced via `#pragma` in example).  
-4. Use Release configuration for best performance.  
-5. Run from Visual Studio or launch the `.exe` from the output folder.
+## 🔨 Build Instructions
+### Prerequisites
+- **OS**: Windows 10/11
+- **IDE**: Microsoft Visual Studio (with "Desktop development with C++" workload installed).
 
-## Version Changelog
-- v1.0.2.0 — 2026-09-17
-	- Right click now opens an info window which will also be used for settings later. still shows the controls.
-	- Counts the amount of shown lines and adjusts window height automatcally.
-- v1.0.1.0 — 2026-09-17
-	- Better controls and right click explains them.
-- v1.0.0.0 — 2026-09-17
-	- Initial release: borderless widget with CPU and GPU monitoring.
+### Steps
+1. Open the solution (`MiniMonitor.slnx` or `.vcxproj`) in Visual Studio.
+2. Set the build configuration to **Release**.
+3. Set the platform to **x64**.
+4. Build the solution (**Ctrl+Shift+B**).
+5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
+
+## 📜 License
+All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
