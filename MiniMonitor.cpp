@@ -192,7 +192,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         WS_EX_TOOLWINDOW,
         szWindowClass, L"",            // No title text (no help/info in title)
         WS_POPUP,
-        100, 100, 80, 30, //dimensions
+        100, 100, 70, 50, //dimensions
         nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd) return FALSE;
@@ -288,19 +288,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"GPU:%0.0f%%", gpuLoad);
         lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"salami");
+        swprintf_s(tmp, _countof(tmp), L"placeholder");
         lines.emplace_back(tmp);
 
         // Example of adding another line (commented out) — uncomment or add more as needed
         // swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
         // lines.emplace_back(tmp);
 
-        // Determine per-line rects and draw each centered in its slice
+        // Count how many swprintf_s-produced lines we have
         int count = static_cast<int>(lines.size());
+        int swprintfCount = count; // number of swprintf_s calls that produced lines here
+
+        // Determine per-line rects and draw each centered in its slice
         if (count > 0)
         {
             SetTextColor(hdc, RGB(0, 255, 100));
             SetBkMode(hdc, TRANSPARENT);
+
+            // Measure one line height using current font
+            TEXTMETRIC tm;
+            GetTextMetrics(hdc, &tm);
+            int lineHeight = tm.tmHeight;
+            int padding = 8; // top+bottom padding
+
+            int desiredClientHeight = lineHeight * count + padding * 2;
+
+            // Compute non-client height so we resize the window correctly (client + non-client = window size)
+            RECT wndRect;
+            GetWindowRect(hWnd, &wndRect);
+            int windowHeight = wndRect.bottom - wndRect.top;
+            int clientHeight = rect.bottom - rect.top;
+            int nonClientHeight = windowHeight - clientHeight;
+            int desiredWindowHeight = desiredClientHeight + nonClientHeight;
+
+            int currentWindowWidth = wndRect.right - wndRect.left;
+            // Only resize if height differs (avoid flicker/continuous repaints)
+            if (abs(windowHeight - desiredWindowHeight) > 1)
+            {
+                // Keep position, change size only
+                SetWindowPos(hWnd, NULL, 0, 0, currentWindowWidth, desiredWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
+                // Update client rect after resize
+                GetClientRect(hWnd, &rect);
+                clientHeight = rect.bottom - rect.top;
+            }
 
             int height = rect.bottom - rect.top;
             for (int i = 0; i < count; ++i)
