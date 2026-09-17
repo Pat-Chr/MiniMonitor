@@ -12,29 +12,29 @@
 
 #define MAX_LOADSTRING 100
 
-// Globale Instanzen und Fenstertexte
+// Global instances and window text
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 
-// PDH-Leistungszähler für CPU und GPU
+// PDH performance counters for CPU and GPU
 PDH_HQUERY cpuQuery;
 PDH_HCOUNTER cpuCounter;
 PDH_HQUERY gpuQuery;
 PDH_HCOUNTER gpuCounter;
 
-// Aktuelle Lastwerte und Initialisierungsstatus
+// Current load values and initialization status
 float cpuLoad = 0.0f;
 float gpuLoad = 0.0f;
 bool firstSampleTaken = false;
 
-// Vorwärtsdeklarationen der Windows-Funktionen und Update-Funktion
+// Forward declarations of Windows functions and update function
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
 
-// Versteckt Toolbars, ReBars und Statusleisten-Kinder im Fenster
+// Hide toolbar, rebar and statusbar child windows in the window
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
 {
     char cls[64] = {0};
@@ -47,7 +47,7 @@ static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
     char txt[256] = {0};
     GetWindowTextA(child, txt, sizeof(txt));
     if (txt[0]) {
-        // Platz für zusätzliche Logik beim Erkennen von sichtbarem Text
+        // Space for additional logic when detecting visible text
     }
     return TRUE;
 }
@@ -90,11 +90,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // --- PDH INITIALIZATION ---
     PDH_STATUS status;
     status = PdhOpenQuery(NULL, NULL, &cpuQuery);
-    if (status != ERROR_SUCCESS) { /* Fehler behandeln */ }
+    if (status != ERROR_SUCCESS) { /* handle error */ }
 
     status = PdhAddEnglishCounterW(cpuQuery, L"\\Processor(_Total)\\% Processor Time", NULL, &cpuCounter);
     if (status != ERROR_SUCCESS) {
-        // Log/handle – ohne gültigen Counter bleibt cpuLoad 0
+        // Log/handle – without a valid counter cpuLoad remains 0
     }
 
     PdhOpenQuery(NULL, NULL, &gpuQuery);
@@ -139,12 +139,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance;
 
-    // WS_POPUP: kein Rahmen/Titel
-    // WS_EX_TOOLWINDOW: aus Taskleiste ausblenden
-    // Kein WS_EX_TOPMOST -> Fenster ist nicht immer im Vordergrund
+    // WS_POPUP: no border/title
+    // WS_EX_TOOLWINDOW: hide from taskbar
+    // No WS_EX_TOPMOST -> window is not always-on-top
     HWND hWnd = CreateWindowExW(
         WS_EX_TOOLWINDOW,
-        szWindowClass, L"",            // Kein Titeltext (keine Hilfe/Info im Titel)
+        szWindowClass, L"",            // No title text (no help/info in title)
         WS_POPUP,
         100, 100, 100, 30, // Tiny dimensions
         nullptr, nullptr, hInstance, nullptr);
@@ -177,7 +177,7 @@ void UpdatePerformanceData()
     if (getStatus == ERROR_SUCCESS && std::isfinite(cpuVal.doubleValue)) {
         cpuLoad = (float)cpuVal.doubleValue;
     } else {
-        // optional: cpuLoad = 0 oder Fehlerlog
+        // optional: cpuLoad = 0 or error log
     }
 
     // 2. Get GPU Load (Summing all engines)
@@ -186,10 +186,10 @@ void UpdatePerformanceData()
     DWORD dwSize = 0;
     PPDH_FMT_COUNTERVALUE_ITEM_W pItems = nullptr;
 
-    // Erste Abfrage: ermittelt benötigte Byte-Größe (dwSize) und Anzahl Elemente (dwCount)
+    // First query: determines required byte-size (dwSize) and number of items (dwCount)
     PDH_STATUS status = PdhGetFormattedCounterArrayW(gpuCounter, PDH_FMT_DOUBLE, &dwSize, &dwCount, NULL);
 
-    // PDH liefert PDH_MORE_DATA wenn der Buffer zu klein ist — dwSize enthält dann den benötigten Wert
+    // PDH returns PDH_MORE_DATA when the buffer is too small — dwSize will then contain the required value
     if ((status == PDH_MORE_DATA || status == ERROR_SUCCESS) && dwSize > 0 && dwCount > 0) {
         pItems = (PPDH_FMT_COUNTERVALUE_ITEM_W)malloc(dwSize);
         if (pItems != nullptr) {
@@ -260,11 +260,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         // Show a simple information dialog explaining the controls
         LPCWSTR info =
-            L"MiniMonitor Steuerung:\n\n"
-            L" - Linksklick und Ziehen: Fenster verschieben\n"
-            L" - Doppelklick: Fenster schliessen\n"
-            L" - Rechtsklick: Diese Hilfe anzeigen\n";
-        MessageBoxW(hWnd, info, L"Wie geht'n das?", MB_OK | MB_ICONINFORMATION);
+            L"MiniMonitor Controls:\n\n"
+            L" - Left click & drag: move window\n"
+            L" - Double click: close window\n"
+            L" - Right click: show this help\n";
+        MessageBoxW(hWnd, info, L"Controls", MB_OK | MB_ICONINFORMATION);
     }
     break;
 
