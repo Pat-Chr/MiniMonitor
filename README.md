@@ -38,6 +38,12 @@ cd "C:\Pfad\Zu\Ihrem\Projekt\Ausgabeverzeichnis"
 - Das Fenster ist bewusst borderless; Mausinteraktionen (Kontextmenü, Einstellungen) können erweitert werden.  
 - Für Unit‑Tests ein separates Testprojekt verwenden.
 
+## Versionsverlauf / Changelog (Deutsch)
+- v1.0.1 — 2026-09-17
+  - Bessere Steuerung und Rechtsklick erklärt, wie es geht.
+- v1.0.0 — 2026-09-17
+  - Erstveröffentlichung: Randloses Widget mit CPU‑ und GPU‑Monitoring via PDH.
+
 ---
 
 # README.en.md (English)
@@ -79,3 +85,9 @@ cd "C:\Path\To\Your\Project\Output\Directory"
 - Additional performance counters can be added if needed.  
 - The window is intentionally borderless; expand mouse interactions (context menu, settings) as desired.  
 - Place unit tests in a separate test project.
+
+## Version Changelog (English)
+- v1.0.1 — 2026-09-17
+  - Better controls and right click explains them.
+- v1.0.0 — 2026-09-17
+  - Initial release: borderless widget with CPU and GPU monitoring via PDH.

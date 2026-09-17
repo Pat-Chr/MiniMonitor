@@ -121,7 +121,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wcex.lpfnWndProc = WndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
@@ -251,10 +251,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
         break;
 
-    case WM_RBUTTONDOWN:
-        // Close window with right-click (since left-click is used for dragging)
+    case WM_LBUTTONDBLCLK:
+        // Close window on double left-click
         DestroyWindow(hWnd);
         break;
+
+    case WM_RBUTTONUP:
+    {
+        // Show a simple information dialog explaining the controls
+        LPCWSTR info =
+            L"MiniMonitor Steuerung:\n\n"
+            L" - Linksklick und Ziehen: Fenster verschieben\n"
+            L" - Doppelklick: Fenster schliessen\n"
+            L" - Rechtsklick: Diese Hilfe anzeigen\n";
+        MessageBoxW(hWnd, info, L"Wie geht'n das?", MB_OK | MB_ICONINFORMATION);
+    }
+    break;
 
     case WM_DESTROY:
         PdhCloseQuery(cpuQuery);
