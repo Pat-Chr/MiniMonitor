@@ -1,13 +1,12 @@
 # README.md
 
-MiniMonitor is a minimalist, unobtrusive Windows desktop widget for real‑time CPU and GPU utilization monitoring. It displays values in a small borderless window with a dark background and neon green text — ideal for gamers and power users.
+MiniMonitor is a minimalist Windows desktop widget for real‑time CPU and GPU utilization monitoring. It displays values in a small borderless window with a dark background and neon green text.
 
 ## Features
 - Minimal, borderless widget (Tool Window — does not appear in the taskbar)  
 - Real‑time updates every 500 ms  
 - Low resource usage via the PDH API (Performance Data Helper)  
-- Aggregated GPU monitoring: detects all GPU engines and combines their utilization  
-- Simple controls: drag to move, right‑click to exit
+- Simple controls: drag to move, double‑click to exit, right click for info and settings (future)
 
 ## Display format
 C:XX% G:XX%
@@ -27,18 +26,9 @@ C:XX% G:XX%
 4. Use Release configuration for best performance.  
 5. Run from Visual Studio or launch the `.exe` from the output folder.
 
-Example (PowerShell):
-```
-cd "C:\Path\To\Your\Project\Output\Directory"
-.\MiniMonitor.exe
-```
-
-## Development notes
-- Additional performance counters can be added if needed.  
-- The window is intentionally borderless; expand mouse interactions (context menu, settings) as desired.  
-- Place unit tests in a separate test project.
-
 ## Version Changelog (English)
+- v1.0.2 — 2026-09-17
+  - Right click now opens an info window which will also be used for settings later. still shows the controls.
 - v1.0.1 — 2026-09-17
   - Better controls and right click explains them.
 - v1.0.0 — 2026-09-17

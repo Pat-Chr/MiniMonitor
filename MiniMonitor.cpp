@@ -34,6 +34,52 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
 
+// Info window procedure for showing controls / settings
+LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+
+        RECT rect;
+        GetClientRect(hWnd, &rect);
+
+        HBRUSH hBg = CreateSolidBrush(RGB(30, 30, 30));
+        FillRect(hdc, &rect, hBg);
+        DeleteObject(hBg);
+
+        SetTextColor(hdc, RGB(200, 200, 200));
+        SetBkMode(hdc, TRANSPARENT);
+
+        LPCWSTR info =
+            L"MiniMonitor Controls:\n\n"
+            L" - Left click & drag: move window\n"
+            L" - Double click: close window\n"
+            L" - Right click: open this window (settings)\n\n"
+            L"Settings will be implemented here.";
+
+        DrawTextW(hdc, info, -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
+
+        EndPaint(hWnd, &ps);
+    }
+    return 0;
+
+    case WM_CLOSE:
+        DestroyWindow(hWnd);
+        return 0;
+
+    case WM_DESTROY:
+        // Do not call PostQuitMessage here; this is a child/settings window
+        return 0;
+
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+}
+
 // Hide toolbar, rebar and statusbar child windows in the window
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
 {
@@ -258,13 +304,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_RBUTTONUP:
     {
-        // Show a simple information dialog explaining the controls
-        LPCWSTR info =
-            L"MiniMonitor Controls:\n\n"
-            L" - Left click & drag: move window\n"
-            L" - Double click: close window\n"
-            L" - Right click: show this help\n";
-        MessageBoxW(hWnd, info, L"Controls", MB_OK | MB_ICONINFORMATION);
+        // Open a modeless settings/info window instead of a MessageBox
+        const wchar_t* className = L"MiniMonitorSettings";
+        HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);
+
+        // Register class if not already registered
+        WNDCLASSEX wcx = {};
+        if (!GetClassInfoEx(hInst, className, &wcx))
+        {
+            wcx.cbSize = sizeof(WNDCLASSEX);
+            wcx.style = CS_HREDRAW | CS_VREDRAW;
+            wcx.lpfnWndProc = InfoWndProc;
+            wcx.cbClsExtra = 0;
+            wcx.cbWndExtra = 0;
+            wcx.hInstance = hInst;
+            wcx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+            wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+            wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+            wcx.lpszMenuName = NULL;
+            wcx.lpszClassName = className;
+            wcx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+            RegisterClassEx(&wcx);
+        }
+
+        // If window already exists, bring it to front
+        HWND infoHwnd = FindWindow(className, NULL);
+        if (infoHwnd)
+        {
+            if (IsIconic(infoHwnd)) ShowWindow(infoHwnd, SW_RESTORE);
+            ShowWindow(infoHwnd, SW_SHOWNORMAL);
+            SetForegroundWindow(infoHwnd);
+            SetFocus(infoHwnd);
+        }
+        else
+        {
+            // Position the settings window near the main window
+            RECT rcMain = {};
+            GetWindowRect(hWnd, &rcMain);
+            int width = 420, height = 260;
+            int x = rcMain.left + 40;
+            int y = rcMain.top + 40;
+
+            // Ensure the window is on-screen (basic clamp)
+            int screenW = GetSystemMetrics(SM_CXSCREEN);
+            int screenH = GetSystemMetrics(SM_CYSCREEN);
+            if (x + width > screenW) x = screenW - width - 40;
+            if (y + height > screenH) y = screenH - height - 40;
+            if (x < 0) x = 40;
+            if (y < 0) y = 40;
+
+            HWND newHwnd = CreateWindowEx(
+                WS_EX_OVERLAPPEDWINDOW,
+                className,
+                L"MiniMonitor - Settings",
+                WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+                x, y, width, height,
+                NULL,
+                NULL,
+                hInst,
+                NULL);
+
+            // Ensure the newly created window is shown and updated
+            if (newHwnd)
+            {
+                ShowWindow(newHwnd, SW_SHOWNORMAL);
+                UpdateWindow(newHwnd);
+                SetForegroundWindow(newHwnd);
+                SetFocus(newHwnd);
+            }
+        }
     }
     break;
 
