@@ -26,7 +26,7 @@ C:XX% G:XX%
 4. Use Release configuration for best performance.  
 5. Run from Visual Studio or launch the `.exe` from the output folder.
 
-## Version Changelog (English)
+## Version Changelog
 - v1.0.2.0 — 2026-09-17
   - Right click now opens an info window which will also be used for settings later. still shows the controls.
 - v1.0.1.0 — 2026-09-17
