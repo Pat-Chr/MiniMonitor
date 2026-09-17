@@ -26,6 +26,7 @@ PDH_HCOUNTER gpuCounter;
 // Current load values and initialization status
 float cpuLoad = 0.0f;
 float gpuLoad = 0.0f;
+float ramLoad = 0.0f;
 bool firstSampleTaken = false;
 
 // Forward declarations of Windows functions and update function
@@ -255,6 +256,23 @@ void UpdatePerformanceData()
             pItems = nullptr;
         }
     }
+
+    // 3. Get RAM Load
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo) != 0 && memInfo.ullTotalPhys > 0) {
+        // Calculate used percentage (0..100)
+        double used = (double)(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
+        double percent = (used * 100.0) / (double)memInfo.ullTotalPhys;
+        if (std::isfinite(percent)) {
+            // Clamp to [0,100]
+            if (percent < 0.0) percent = 0.0;
+            if (percent > 100.0) percent = 100.0;
+            ramLoad = (float)percent;
+        }
+    } else {
+        // optional: ramLoad = 0 or error log
+    }
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -288,7 +306,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"GPU:%0.0f%%", gpuLoad);
         lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"placeholder");
+        swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
         lines.emplace_back(tmp);
 
         // Example of adding another line (commented out) — uncomment or add more as needed
