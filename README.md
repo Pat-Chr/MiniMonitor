@@ -7,12 +7,14 @@ Minimalist Windows desktop widget for real-time CPU and GPU utilization monitori
 - **Low Overhead**: Uses Windows Performance Data Helper (PDH) API for efficient, low-resource monitoring.
 - **Real-time Updates**: Refreshes every 500ms.
 - **Non-Intrusive**: Uses `WS_EX_TOOLWINDOW` so it does not appear in the taskbar.
+- **Lightweight**: Minimal dependencies; single executable expected for typical builds.
 
 ## 🖥️ Display Format
 The widget displays current utilization in a stacked format:
 ```text
 CPU:XX%
 GPU:XX%
+RAM:XX%
 ```
 *(Note: The current version may include a placeholder line for future metrics like RAM.)*
 
@@ -27,6 +29,8 @@ GPU:XX%
 - **Language**: C++
 - **API**: Win32 API, PDH (Performance Data Helper)
 - **Dependencies**: `pdh.lib` (linked via `#pragma comment`)
+- **Build type**: Recommended Release x64 for lowest overhead
+- **Window style**: borderless / toolwindow; designed for minimal screen real estate
 
 ## 🔨 Build Instructions
 ### Prerequisites
@@ -39,6 +43,18 @@ GPU:XX%
 3. Set the platform to **x64**.
 4. Build the solution (**Ctrl+Shift+B**).
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
+
+## 🗒️ Changelog
+- Unreleased
+	- Restored README items and added changelog section.
+	- RAM load added.
+- v1.0.1.0 — 2026-09-17
+	- Added GPU utilization display.
+	- Implemented 500ms refresh cadence.
+	- Control info Window added with basic instructions. Also used for settings later.
+- v1.0.0.0 — 2026-09-17
+	- Minimal CPU monitor UI implemented.
+	- Borderless toolwindow and basic mouse controls.
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
