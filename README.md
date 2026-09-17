@@ -32,4 +32,4 @@ C:XX% G:XX%
 - v1.0.1.0 — 2026-09-17
   - Better controls and right click explains them.
 - v1.0.0.0 — 2026-09-17
-  - Initial release: borderless widget with CPU and GPU monitoring via PDH.
+  - Initial release: borderless widget with CPU and GPU monitoring.
