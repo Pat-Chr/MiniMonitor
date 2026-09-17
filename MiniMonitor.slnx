@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="MiniMonitor.vcxproj" />
+  <Project Path="MiniMonitor.vcxproj" Id="f4186924-0dc4-4ca2-9ed5-4a0024ed3a82" />
 </Solution>
