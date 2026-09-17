@@ -1,32 +1,81 @@
-MiniMonitor
-MiniMonitor is a lightweight, unobtrusive Windows desktop widget designed to provide real-time monitoring of your system’s CPU and GPU utilization. It presents the data in a tiny, borderless window that stays out of your way, making it perfect for gamers or power users who want to keep an eye on performance without a bulky overlay.
+# MiniMonitor (Deutsch)
 
-✨ Features
-Minimalist Design: A tiny, borderless window with a dark background and neon green text.
-Real-time Updates: Refreshes system statistics every 500ms.
-Low Resource Footprint: Uses the Windows Performance Data Helper (PDH) API for highly efficient data collection.
-Unobtrusive: Designed as a “Tool Window,” meaning it will not clutter your Taskbar.
-Aggregate GPU Tracking: Automatically detects and sums up the utilization of all GPU engines.
-🖥️ Display Format
-The monitor displays information in the following format: C:XX% G:XX%
+MiniMonitor ist ein minimalistisches, unauffälliges Windows-Desktop-Widget zur Echtzeitüberwachung von CPU‑ und GPU‑Auslastung. Es zeigt die Werte in einem kleinen, rahmenlosen Fenster mit dunklem Hintergrund und neongrüner Schrift — ideal für Gamer und Power‑User.
 
-C: Total CPU Processor Time percentage.
-G: Total GPU Engine Utilization percentage.
-🖱️ Controls
-Since the window has no title bar or borders, use the following mouse controls to interact with it:
+## Features
+- Minimalistisches, randloses Widget (Tool Window — erscheint nicht in der Taskleiste)  
+- Echtzeit‑Aktualisierung: alle 500 ms  
+- Geringer Ressourcenverbrauch durch PDH-API (Performance Data Helper)  
+- Aggregierte GPU‑Überwachung: erkennt alle GPU‑Engines und fasst ihre Auslastung zusammen  
+- Einfache Bedienung: Fenster verschieben per Drag, Rechtsklick zum Beenden
 
-Move Window: Click and hold the Left Mouse Button anywhere on the widget to drag it to a new position on your screen.
-Close Program: Right-click anywhere on the widget to instantly exit the application.
-🛠️ Requirements & Compilation
-Prerequisites
-Operating System: Windows (required for WinAPI and PDH).
-Compiler: A C++ compiler supporting Windows development (e.g., Microsoft Visual Studio with the “Desktop development with C++” workload).
-Compilation Instructions
-The project is written in C++ and utilizes the pdh.lib library.
+## Anzeigeformat
+C:XX% G:XX%
 
-If you are using Visual Studio:
+- C: Gesamt-CPU-Prozessorzeit (%)  
+- G: Gesamte GPU‑Engine‑Auslastung (%)
 
-Create a new “Windows Desktop Application” project.
-Add MiniMonitor.cpp (and its corresponding .h files) to your project.
-The code includes #pragma comment(lib, "pdh.lib"), so the linker will automatically include the necessary library.
-Build the solution in Release mode for the best performance.
+## Voraussetzungen
+- Betriebssystem: Windows (erforderlich für WinAPI und PDH)  
+- IDE: Microsoft Visual Studio (Desktop‑Entwicklung mit C++ empfohlen)  
+- Linker: pdh.lib (wird per `#pragma comment(lib, "pdh.lib")` eingebunden)
+
+## Kompilieren (Visual Studio)
+1. Neues Projekt: "Windows Desktop Application" (oder vorhandenes Projekt öffnen).  
+2. Quelldatei(n) hinzufügen (z. B. `MiniMonitor.cpp`).  
+3. pdh.lib ist per `#pragma` referenziert; ansonsten im Projektlinker sicherstellen.  
+4. Build‑Konfiguration: Release für beste Performance.  
+5. Starten: Debug/Release in Visual Studio oder `.exe` im Ausgabeordner ausführen.
+
+Beispiel (PowerShell):
+```
+cd "C:\Pfad\Zu\Ihrem\Projekt\Ausgabeverzeichnis"
+.\MiniMonitor.exe
+```
+
+## Hinweise zur Entwicklung
+- Weitere Performance‑Counter können ergänzt werden.  
+- Das Fenster ist bewusst borderless; Mausinteraktionen (Kontextmenü, Einstellungen) können erweitert werden.  
+- Für Unit‑Tests ein separates Testprojekt verwenden.
+
+---
+
+# README.en.md (English)
+
+MiniMonitor is a minimalist, unobtrusive Windows desktop widget for real‑time CPU and GPU utilization monitoring. It displays values in a small borderless window with a dark background and neon green text — ideal for gamers and power users.
+
+## Features
+- Minimal, borderless widget (Tool Window — does not appear in the taskbar)  
+- Real‑time updates every 500 ms  
+- Low resource usage via the PDH API (Performance Data Helper)  
+- Aggregated GPU monitoring: detects all GPU engines and combines their utilization  
+- Simple controls: drag to move, right‑click to exit
+
+## Display format
+C:XX% G:XX%
+
+- C: Total CPU processor time (%)  
+- G: Total GPU engine utilization (%)
+
+## Requirements
+- OS: Windows (required for WinAPI and PDH)  
+- IDE: Microsoft Visual Studio (Desktop Development with C++ recommended)  
+- Linker: pdh.lib (included via `#pragma comment(lib, "pdh.lib")`)
+
+## Build (Visual Studio)
+1. Create a new "Windows Desktop Application" project (or open an existing one).  
+2. Add source file(s) (e.g. `MiniMonitor.cpp`).  
+3. Ensure pdh.lib is linked (already referenced via `#pragma` in example).  
+4. Use Release configuration for best performance.  
+5. Run from Visual Studio or launch the `.exe` from the output folder.
+
+Example (PowerShell):
+```
+cd "C:\Path\To\Your\Project\Output\Directory"
+.\MiniMonitor.exe
+```
+
+## Development notes
+- Additional performance counters can be added if needed.  
+- The window is intentionally borderless; expand mouse interactions (context menu, settings) as desired.  
+- Place unit tests in a separate test project.
