@@ -278,24 +278,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         FillRect(hdc, &rect, hBgBrush);
         DeleteObject(hBgBrush);
 
-        // Prepare Text (stacked: CPU above GPU)
-        wchar_t cpuBuf[32];
-        wchar_t gpuBuf[32];
-        swprintf_s(cpuBuf, _countof(cpuBuf), L"CPU:%0.0f%%", cpuLoad);
-        swprintf_s(gpuBuf, _countof(gpuBuf), L"GPU:%0.0f%%", gpuLoad);
+        // Prepare Text (stacked: flexible number of lines)
+        // Add more lines by pushing to 'lines' below
+        std::vector<std::wstring> lines;
+        wchar_t tmp[128];
 
-        // Split client rect into two halves for vertical stacking
-        RECT rectTop = rect;
-        RECT rectBottom = rect;
-        int midY = (rect.top + rect.bottom) / 2;
-        rectTop.bottom = midY;
-        rectBottom.top = midY;
+        // Existing lines
+        swprintf_s(tmp, _countof(tmp), L"CPU:%0.0f%%", cpuLoad);
+        lines.emplace_back(tmp);
+        swprintf_s(tmp, _countof(tmp), L"GPU:%0.0f%%", gpuLoad);
+        lines.emplace_back(tmp);
+        swprintf_s(tmp, _countof(tmp), L"salami");
+        lines.emplace_back(tmp);
 
-        // Draw Neon Green Text
-        SetTextColor(hdc, RGB(0, 255, 100));
-        SetBkMode(hdc, TRANSPARENT);
-        DrawTextW(hdc, cpuBuf, -1, &rectTop, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-        DrawTextW(hdc, gpuBuf, -1, &rectBottom, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        // Example of adding another line (commented out) — uncomment or add more as needed
+        // swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
+        // lines.emplace_back(tmp);
+
+        // Determine per-line rects and draw each centered in its slice
+        int count = static_cast<int>(lines.size());
+        if (count > 0)
+        {
+            SetTextColor(hdc, RGB(0, 255, 100));
+            SetBkMode(hdc, TRANSPARENT);
+
+            int height = rect.bottom - rect.top;
+            for (int i = 0; i < count; ++i)
+            {
+                RECT part = rect;
+                part.top = rect.top + (height * i) / count;
+                part.bottom = rect.top + (height * (i + 1)) / count;
+                DrawTextW(hdc, lines[i].c_str(), -1, &part, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            }
+        }
 
         EndPaint(hWnd, &ps);
     }
