@@ -27,9 +27,9 @@ C:XX% G:XX%
 5. Run from Visual Studio or launch the `.exe` from the output folder.
 
 ## Version Changelog (English)
-- v1.0.2 — 2026-09-17
+- v1.0.2.0 — 2026-09-17
   - Right click now opens an info window which will also be used for settings later. still shows the controls.
-- v1.0.1 — 2026-09-17
+- v1.0.1.0 — 2026-09-17
   - Better controls and right click explains them.
-- v1.0.0 — 2026-09-17
+- v1.0.0.0 — 2026-09-17
   - Initial release: borderless widget with CPU and GPU monitoring via PDH.
