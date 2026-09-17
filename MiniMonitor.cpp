@@ -192,7 +192,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         WS_EX_TOOLWINDOW,
         szWindowClass, L"",            // No title text (no help/info in title)
         WS_POPUP,
-        100, 100, 100, 30, // Tiny dimensions
+        100, 100, 80, 30, //dimensions
         nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd) return FALSE;
@@ -278,14 +278,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         FillRect(hdc, &rect, hBgBrush);
         DeleteObject(hBgBrush);
 
-        // Prepare Text
-        wchar_t buffer[32];
-        swprintf_s(buffer, _countof(buffer), L"C:%0.0f%%  G:%0.0f%%", cpuLoad, gpuLoad);
+        // Prepare Text (stacked: CPU above GPU)
+        wchar_t cpuBuf[32];
+        wchar_t gpuBuf[32];
+        swprintf_s(cpuBuf, _countof(cpuBuf), L"CPU:%0.0f%%", cpuLoad);
+        swprintf_s(gpuBuf, _countof(gpuBuf), L"GPU:%0.0f%%", gpuLoad);
+
+        // Split client rect into two halves for vertical stacking
+        RECT rectTop = rect;
+        RECT rectBottom = rect;
+        int midY = (rect.top + rect.bottom) / 2;
+        rectTop.bottom = midY;
+        rectBottom.top = midY;
 
         // Draw Neon Green Text
         SetTextColor(hdc, RGB(0, 255, 100));
         SetBkMode(hdc, TRANSPARENT);
-        DrawTextW(hdc, buffer, -1, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        DrawTextW(hdc, cpuBuf, -1, &rectTop, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        DrawTextW(hdc, gpuBuf, -1, &rectBottom, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
         EndPaint(hWnd, &ps);
     }
@@ -304,7 +314,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_RBUTTONUP:
     {
-        // Open a modeless settings/info window instead of a MessageBox
+        // Open a modeless settings/info window
         const wchar_t* className = L"MiniMonitorSettings";
         HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);
 
