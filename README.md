@@ -47,7 +47,8 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.2.3 - unreleased
-	- One pixel border für the main window. looks better now.
+	- One pixel border for the main window. looks better now.
+	- now creates a config file if it doesnt already exists. the config file does nothing so far.
 - v1.0.2.2 - 2026-09-19
 	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
@@ -70,7 +71,6 @@ For next release
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: there was an error last time i tried.
 
 For later
-- the program should create a config file at start. only if it doesnt already exist. Just an empty file for now.
 - The config file should have some lines with settings in it and be able to read and write them.
 - If the config file works add the first settings option. (maybe "text color")
 
