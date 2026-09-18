@@ -2,7 +2,7 @@
 
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
-![preview](docs/images/preview_1.0.2.1.png)
+![preview](docs/images/preview_1.0.2.3.png)
 
 ## 🚀 Features
 - **Minimalist Design**: Small, borderless window that stays out of your way.
@@ -46,10 +46,10 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.2.3 - unreleased
+- v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
 	- now creates a config file if it doesnt already exists. the config file does nothing so far.
-- v1.0.2.2 - 2026-09-19
+- v1.0.2.2 - 2026-09-18
 	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
 	- New Icon. Chip with graph.
