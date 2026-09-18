@@ -2,6 +2,8 @@
 
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
+![](docs/images/preview_1.0.1.0.png)
+
 ## 🚀 Features
 - **Minimalist Design**: Small, borderless window that stays out of your way.
 - **Low Overhead**: Uses Windows Performance Data Helper (PDH) API for efficient, low-resource monitoring.
