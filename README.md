@@ -73,15 +73,6 @@ For later
 - the program should create a config file at start. only if it doesnt already exist. Just an empty file for now.
 - The config file should have some lines with settings in it and be able to read and write them.
 - If the config file works add the first settings option. (maybe "text color")
-- The Window could be transparent or maybe have a little border. Some design improvements.
-- The Design could be reworked to look like:
-```text
-	-------------
-	| CPU% CRAM% |
-	| GPU% GRAM% |
-	-------------
- ```
-- 
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
