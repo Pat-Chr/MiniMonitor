@@ -3,6 +3,7 @@
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
 ![Preview v1.0.1.0](docs/images/preview_1.0.1.0.png)
+(Latest release version)
 
 ## 🚀 Features
 - **Minimalist Design**: Small, borderless window that stays out of your way.
