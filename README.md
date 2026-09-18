@@ -16,7 +16,7 @@ CPU:XX%
 GPU:XX%
 RAM:XX%
 ```
-*(Note: The current version may include a placeholder line for future metrics like RAM.)*
+*(Note: RAM is already working, but didn't make it into the binary.)*
 
 ## 🖱️ Controls
 | Action | Result |
@@ -47,7 +47,7 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.2.0 — 2026-09-17
 	- CHangelog section in readme was gone. fixed.
-	- RAM load added. Is already working, the compiled exe doesn't have it yet.
+	- RAM load added. Is already working, the released doesn't have it yet.
 - v1.0.1.0 — 2026-09-17
 	- Added GPU utilization display.
 	- Implemented 500ms refresh cadence.
@@ -55,6 +55,16 @@ RAM:XX%
 - v1.0.0.0 — 2026-09-17
 	- Minimal CPU monitor UI implemented.
 	- Borderless toolwindow and basic mouse controls.
+
+## 🗒️ Planned features and improvements.
+For next release
+- The Functions which are getting all the information should be in their own file or class. This would make the code of the main program more compact.
+- Adding a tooltip that says "Right click for settings" when the user hovers the mouse ofer the main window. Note: there was an error last time i tried.
+
+For later
+- the program should create a config file at start. only if it doesnt already exist. Just an empty file for now.
+- The config file should have some lines with settings in it and be able to read and write them.
+- If the config file works add the first settings option. (maybe "text color")
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
