@@ -45,8 +45,11 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.2.1 - unreleased WIP
+	- New Icon. Chip with graph.
+ 	- Added list of future plans and ideas to readme.
 - v1.0.2.0 — 2026-09-17
-	- CHangelog section in readme was gone. fixed.
+	- Changelog section in readme was gone. fixed.
 	- RAM load added. Is already working, the released doesn't have it yet.
 - v1.0.1.0 — 2026-09-17
 	- Added GPU utilization display.
