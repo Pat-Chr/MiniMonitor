@@ -192,7 +192,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     HWND hWnd = CreateWindowExW(
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
         szWindowClass, L"",            // No title text (no help/info in title)
-        WS_POPUP,
+        WS_POPUP | WS_BORDER,
         100, 100, 70, 50, //dimensions
         nullptr, nullptr, hInstance, nullptr);
 

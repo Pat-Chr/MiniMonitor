@@ -46,6 +46,8 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.2.3 - unreleased
+	- One pixel border für the main window. looks better now.
 - v1.0.2.2 - 2026-09-19
 	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
