@@ -2,7 +2,7 @@
 
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
-![preview](docs/images/preview_1.0.1.0.png)
+![preview](docs/images/preview_1.0.2.1.png)
 
 ## 🚀 Features
 - **Minimalist Design**: Small, borderless window that stays out of your way.
@@ -65,7 +65,6 @@ RAM:XX%
 
 ## 🗒️ Planned features and improvements.
 For next release
-- The Functions which are getting all the information should be in their own file or class. This would make the code of the main program more compact.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: there was an error last time i tried.
 
 For later
