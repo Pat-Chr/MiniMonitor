@@ -50,7 +50,7 @@ RAM:XX%
  	- Added list of future plans and ideas to readme.
 - v1.0.2.0 — 2026-09-17
 	- Changelog section in readme was gone. fixed.
-	- RAM load added. Is already working, the released doesn't have it yet.
+	- RAM load added. Is already working, the release exe doesn't have it yet.
 - v1.0.1.0 — 2026-09-17
 	- Added GPU utilization display.
 	- Implemented 500ms refresh cadence.
@@ -69,6 +69,10 @@ For later
 - The config file should have some lines with settings in it and be able to read and write them.
 - If the config file works add the first settings option. (maybe "text color")
 - The Window could be transparent or maybe have a little border. Some design improvements.
+- The Design could be reworked to look like:
+  | CPU% CRAM% |
+  | GPU% GRAM% |
+- 
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
