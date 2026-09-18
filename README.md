@@ -45,9 +45,9 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- Unreleased
-	- Restored README items and added changelog section.
-	- RAM load added.
+- v1.0.2.0 — 2026-09-17
+	- CHangelog section in readme was gone. fixed.
+	- RAM load added. Is already working, the compiled exe doesn't have it yet.
 - v1.0.1.0 — 2026-09-17
 	- Added GPU utilization display.
 	- Implemented 500ms refresh cadence.
