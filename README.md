@@ -70,8 +70,12 @@ For later
 - If the config file works add the first settings option. (maybe "text color")
 - The Window could be transparent or maybe have a little border. Some design improvements.
 - The Design could be reworked to look like:
-  | CPU% CRAM% |
-  | GPU% GRAM% |
+```text
+	-------------
+	| CPU% CRAM% |
+	| GPU% GRAM% |
+	-------------
+ ```
 - 
 
 ## 📜 License
