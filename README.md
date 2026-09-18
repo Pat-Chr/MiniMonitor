@@ -46,9 +46,12 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.2.2 - 2026-09-19
+	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
 	- New Icon. Chip with graph.
  	- Added list of future plans and ideas to readme.
+	- Added RAM load display. Now shows CPU, GPU, and RAM utilization.
 - v1.0.2.0 — 2026-09-17
 	- Changelog section in readme was gone. fixed.
 	- RAM load added. Is already working, the release exe doesn't have it yet.

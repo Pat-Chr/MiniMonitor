@@ -145,6 +145,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="getdata.cpp" />
     <ClCompile Include="MiniMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
