@@ -62,7 +62,7 @@ RAM:XX%
 ## 🗒️ Planned features and improvements.
 For next release
 - The Functions which are getting all the information should be in their own file or class. This would make the code of the main program more compact.
-- Adding a tooltip that says "Right click for settings" when the user hovers the mouse ofer the main window. Note: there was an error last time i tried.
+- Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: there was an error last time i tried.
 
 For later
 - the program should create a config file at start. only if it doesnt already exist. Just an empty file for now.
