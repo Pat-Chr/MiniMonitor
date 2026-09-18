@@ -18,7 +18,6 @@ CPU:XX%
 GPU:XX%
 RAM:XX%
 ```
-*(Note: RAM is already working, but didn't make it into the binary.)*
 
 ## 🖱️ Controls
 | Action | Result |
@@ -47,7 +46,7 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.2.1 - unreleased WIP
+- v1.0.2.1 - 2026-09-18
 	- New Icon. Chip with graph.
  	- Added list of future plans and ideas to readme.
 - v1.0.2.0 — 2026-09-17
