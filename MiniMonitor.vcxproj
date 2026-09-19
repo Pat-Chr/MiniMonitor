@@ -143,12 +143,14 @@
     <ClInclude Include="MiniMonitor.h" />
     <ClInclude Include="readconfig.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="settingswindow.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="getdata.cpp" />
     <ClCompile Include="MiniMonitor.cpp" />
     <ClCompile Include="readconfig.cpp" />
+    <ClCompile Include="settingswindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiniMonitor.rc" />

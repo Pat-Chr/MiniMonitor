@@ -34,63 +34,10 @@ bool firstSampleTaken = false;
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK    InfoWndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
 
-// Info window procedure for showing controls / settings
-LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_PAINT:
-    {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-
-        RECT rect;
-        GetClientRect(hWnd, &rect);
-
-        HBRUSH hBg = CreateSolidBrush(RGB(0, 0, 0));
-        FillRect(hdc, &rect, hBg);
-        DeleteObject(hBg);
-
-        SetTextColor(hdc, RGB(255, 255, 255));
-        SetBkMode(hdc, TRANSPARENT);
-
-        char colorBuffer[128] = {0};
-        GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
-
-        // Convert config text (ANSI) to a wide string for DrawTextW
-        WCHAR wColor[128] = {0};
-        MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
-
-        std::wstring info =
-            L"MiniMonitor Controls:\n\n"
-            L" - Left click & drag: move window\n"
-            L" - Double click: close window\n"
-            L" - Right click: open this window (settings)\n\n"
-            L"Current settings: (change them by editing the config.txt)\n";
-
-        info += L"Text Color: ";
-        info += wColor;
-
-        DrawTextW(hdc, info.c_str(), -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
-
-        EndPaint(hWnd, &ps);
-    }
-    return 0;
-
-    case WM_CLOSE:
-        DestroyWindow(hWnd);
-        return 0;
-
-    case WM_DESTROY:
-        // Child/settings window: do not call PostQuitMessage
-        return 0;
-
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-}
+#include "settingswindow.h"
 
 // Hide toolbar, rebar and statusbar child windows in the window
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
