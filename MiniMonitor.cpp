@@ -340,7 +340,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (y < 0) y = 40;
 
             HWND newHwnd = CreateWindowEx(
-                WS_EX_OVERLAPPEDWINDOW,
+                WS_EX_TOPMOST,
                 className,
                 L"Settings",
                 WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,

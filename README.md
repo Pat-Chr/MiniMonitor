@@ -47,9 +47,12 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- x1.0.2.5 - WIP
+	- Settings Window is now always on top
+	- 
 - v1.0.2.4 - 2026-09-19
 	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
-	- you can now change the text color in the config file. (textcolor=R,G,B) where R,G,B are numbers from 0-255. (example: textcolor=255,0,0 for red)
+	- you can now change the text color in the config file. RGB Values.
 	- better icon
 	- settingswindow is now created in its own cpp file. much easier to read and work on.
 	- the settings window now shows the program version and the current text color.
