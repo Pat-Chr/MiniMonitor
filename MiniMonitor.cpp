@@ -56,14 +56,24 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         SetTextColor(hdc, RGB(200, 200, 200));
         SetBkMode(hdc, TRANSPARENT);
 
-        LPCWSTR info =
+        char colorBuffer[128] = {0};
+        GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
+
+        // Konvertiere config-Text (ANSI) in Wide-String für DrawTextW
+        WCHAR wColor[128] = {0};
+        MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
+
+        std::wstring info =
             L"MiniMonitor Controls:\n\n"
             L" - Left click & drag: move window\n"
             L" - Double click: close window\n"
             L" - Right click: open this window (settings)\n\n"
-            L"Settings will be implemented here.";
+            L"Settings will be implemented here.\n";
 
-        DrawTextW(hdc, info, -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
+        info += L"Text Color: ";
+        info += wColor;
+
+        DrawTextW(hdc, info.c_str(), -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
 
         EndPaint(hWnd, &ps);
     }
@@ -74,7 +84,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         return 0;
 
     case WM_DESTROY:
-        // Do not call PostQuitMessage here; this is a child/settings window
+        // Child/settings window: kein PostQuitMessage aufrufen
         return 0;
 
     default:
@@ -259,7 +269,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Determine per-line rects and draw each centered in its slice
         if (count > 0)
         {
-            SetTextColor(hdc, RGB(0, 255, 100));
+			// SetTextColor from config
+            char colorBuffer[128] = { 0 };
+            GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
+            WCHAR wColor[128] = { 0 };
+            MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
+
+            // Parse config "R, G, B" and apply as COLORREF
+            int r = 200, g = 200, b = 200; // default
+            int parsed = sscanf_s(colorBuffer, "%d , %d , %d", &r, &g, &b);
+            if (parsed == 3) {
+                if (r < 0) r = 0; if (r > 255) r = 255;
+                if (g < 0) g = 0; if (g > 255) g = 255;
+                if (b < 0) b = 0; if (b > 255) b = 255;
+                SetTextColor(hdc, RGB(r, g, b));
+            } else {
+                // Fallback-Farbe falls Parsen fehlschlägt
+                SetTextColor(hdc, RGB(200, 200, 200));
+            }
             SetBkMode(hdc, TRANSPARENT);
 
             // Measure one line height using current font

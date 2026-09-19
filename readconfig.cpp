@@ -46,11 +46,63 @@ void EnsureConfigFileExists()
 
     // Wenn Datei neu erstellt wurde (GetLastError != ERROR_ALREADY_EXISTS), schreibe Inhalt
     if (GetLastError() != ERROR_ALREADY_EXISTS) {
-        const char* content = "text_color=FFFFFF\r\ntest1=text\r\ntest2=text2";
+        const char* content = "text_color=0, 255, 100\r\ntest1=text\r\ntest2=text2";
         DWORD written = 0;
         SetFilePointer(h, 0, NULL, FILE_BEGIN);
         WriteFile(h, content, (DWORD)strlen(content), &written, NULL);
     }
 
     CloseHandle(h);
+}
+
+void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
+{
+	const char* name = "config.txt";
+	char path[MAX_PATH] = { 0 };
+	// Pfad zum EXE-Ordner ermitteln
+	char mod[MAX_PATH] = { 0 };
+	if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
+		char* p = strrchr(mod, '\\');
+		if (p) {
+			*++p = '\0'; // behalte Ordnerpfad inklusive abschließendem '\'
+			strcpy_s(path, sizeof(path), mod);
+			strcat_s(path, sizeof(path), name);
+		}
+		else {
+			strcpy_s(path, sizeof(path), name);
+		}
+	}
+	else {
+		// Fallback: aktuelles Verzeichnis
+		GetCurrentDirectoryA(MAX_PATH, path);
+		size_t len = strlen(path);
+		if (len && path[len - 1] != '\\') strcat_s(path, sizeof(path), "\\");
+		strcat_s(path, sizeof(path), name);
+	}
+	// Datei öffnen
+	FILE* file = nullptr;
+	if (fopen_s(&file, path, "rb") != 0 || !file) {
+		OutputDebugStringA("GetTextColorFromConfig: config.txt konnte nicht geöffnet werden.\n");
+		return;
+	}
+	char line[256];
+	while (fgets(line, sizeof(line), file)) {
+		char* pLine = line;
+		// Skip UTF-8 BOM if present
+		if ((unsigned char)pLine[0] == 0xEF && (unsigned char)pLine[1] == 0xBB && (unsigned char)pLine[2] == 0xBF) {
+			pLine += 3;
+		}
+		if (strncmp(pLine, "text_color=", 11) == 0) {
+			strncpy_s(colorBuffer, bufferSize, pLine + 11, _TRUNCATE);
+			// Trim CR/LF
+			size_t len = strlen(colorBuffer);
+			while (len > 0 && (colorBuffer[len - 1] == '\n' || colorBuffer[len - 1] == '\r')) {
+				colorBuffer[len - 1] = '\0';
+				len--;
+			}
+			break;
+		}
+	}
+	fclose(file);
+
 }

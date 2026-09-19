@@ -46,10 +46,12 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.2.4 - unreleased
+	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
+	- you can now change the text color in the config file. (textcolor=R,G,B) where R,G,B are numbers from 0-255. (example: textcolor=255,0,0 for red)
 - v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
 	- now creates a config file if it doesn't already exists. the config file does nothing so far.
-	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
 - v1.0.2.2 - 2026-09-18
 	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
@@ -69,11 +71,11 @@ RAM:XX%
 
 ## 🗒️ Planned features and improvements.
 For next release
-- Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: there was an error last time i tried.
+- Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
+- we really need the main loop to be in a separate cpp file. main.cpp is getting too cluttered.
 
 For later
-- The config file should have some lines with settings in it and be able to read and write them.
-- If the config file works add the first settings option. (maybe "text color")
+- make settings saveable instead of editing the config file manually.
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
