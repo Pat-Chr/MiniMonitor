@@ -1,4 +1,5 @@
 # MiniMonitor
+![icon](docs/images/MiniMonitor.png)
 
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
