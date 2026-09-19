@@ -59,7 +59,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         char colorBuffer[128] = {0};
         GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
 
-        // Konvertiere config-Text (ANSI) in Wide-String für DrawTextW
+        // Convert config text (ANSI) to a wide string for DrawTextW
         WCHAR wColor[128] = {0};
         MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
 
@@ -84,7 +84,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         return 0;
 
     case WM_DESTROY:
-        // Child/settings window: kein PostQuitMessage aufrufen
+        // Child/settings window: do not call PostQuitMessage
         return 0;
 
     default:
@@ -207,7 +207,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
         szWindowClass, L"",            // No title text (no help/info in title)
         WS_POPUP | WS_BORDER,
-        100, 100, 70, 50, //dimensions
+        100, 100, 80, 50, //dimensions
         nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd) return FALSE;
@@ -284,7 +284,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (b < 0) b = 0; if (b > 255) b = 255;
                 SetTextColor(hdc, RGB(r, g, b));
             } else {
-                // Fallback-Farbe falls Parsen fehlschlägt
+                // Fallback color in case of parsing failure
                 SetTextColor(hdc, RGB(200, 200, 200));
             }
             SetBkMode(hdc, TRANSPARENT);

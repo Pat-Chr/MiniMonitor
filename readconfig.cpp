@@ -59,30 +59,31 @@ void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
 {
 	const char* name = "config.txt";
 	char path[MAX_PATH] = { 0 };
-	// Pfad zum EXE-Ordner ermitteln
+	// Determine path to the executable's folder
 	char mod[MAX_PATH] = { 0 };
 	if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
 		char* p = strrchr(mod, '\\');
 		if (p) {
-			*++p = '\0'; // behalte Ordnerpfad inklusive abschließendem '\'
+			*++p = '\0'; // keep folder path including trailing '\'
 			strcpy_s(path, sizeof(path), mod);
 			strcat_s(path, sizeof(path), name);
 		}
 		else {
+			// No path separator found; use filename in current dir
 			strcpy_s(path, sizeof(path), name);
 		}
 	}
 	else {
-		// Fallback: aktuelles Verzeichnis
+		// Fallback: use current working directory
 		GetCurrentDirectoryA(MAX_PATH, path);
 		size_t len = strlen(path);
 		if (len && path[len - 1] != '\\') strcat_s(path, sizeof(path), "\\");
 		strcat_s(path, sizeof(path), name);
 	}
-	// Datei öffnen
+	// Open the config file in binary mode to reliably detect BOM
 	FILE* file = nullptr;
 	if (fopen_s(&file, path, "rb") != 0 || !file) {
-		OutputDebugStringA("GetTextColorFromConfig: config.txt konnte nicht geöffnet werden.\n");
+		OutputDebugStringA("GetTextColorFromConfig: could not open config.txt\n");
 		return;
 	}
 	char line[256];
@@ -92,9 +93,10 @@ void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
 		if ((unsigned char)pLine[0] == 0xEF && (unsigned char)pLine[1] == 0xBB && (unsigned char)pLine[2] == 0xBF) {
 			pLine += 3;
 		}
+		// Look for "text_color=" prefix and copy the value
 		if (strncmp(pLine, "text_color=", 11) == 0) {
 			strncpy_s(colorBuffer, bufferSize, pLine + 11, _TRUNCATE);
-			// Trim CR/LF
+			// Trim trailing CR/LF characters from the value
 			size_t len = strlen(colorBuffer);
 			while (len > 0 && (colorBuffer[len - 1] == '\n' || colorBuffer[len - 1] == '\r')) {
 				colorBuffer[len - 1] = '\0';
