@@ -185,10 +185,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-		// Draw Background. Color options will be added in the future. For now, it's fixed.
+        //fetch the background color from the config file
+        char bg_Color[128] = {0};
+        GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
+        // Convert config text (ANSI) to a wide string for DrawTextW
+        WCHAR wBgColor[128] = {0};
+        MultiByteToWideChar(CP_ACP, 0, bg_Color, -1, wBgColor, _countof(wBgColor));
+
+		// parse config "R, G, B" and apply as COLORREF
+		int r = 0, g = 0, b = 0; // default black
+		int parsed = sscanf_s(bg_Color, "%d , %d , %d", &r, &g, &b);
+		if (parsed == 3) {
+			if (r < 0) r = 0; if (r > 255) r = 255;
+			if (g < 0) g = 0; if (g > 255) g = 255;
+			if (b < 0) b = 0; if (b > 255) b = 255;
+            SetBkColor(hdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
+		}
+		else {
+			// Fallback color in case of parsing failure
+            SetBkColor(hdc, ((COLORREF)(((BYTE)(0) | ((WORD)((BYTE)(0)) << 8)) | (((DWORD)(BYTE)(0)) << 16))));
+		}
+
+		// Draw Background.
         RECT rect;
         GetClientRect(hWnd, &rect);
-        HBRUSH hBgBrush = CreateSolidBrush(RGB(0, 0, 0));
+        HBRUSH hBgBrush = CreateSolidBrush(((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
         FillRect(hdc, &rect, hBgBrush);
         DeleteObject(hBgBrush);
 
@@ -229,10 +250,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (r < 0) r = 0; if (r > 255) r = 255;
                 if (g < 0) g = 0; if (g > 255) g = 255;
                 if (b < 0) b = 0; if (b > 255) b = 255;
-                SetTextColor(hdc, RGB(r, g, b));
+                SetTextColor(hdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
             } else {
                 // Fallback color in case of parsing failure
-                SetTextColor(hdc, RGB(200, 200, 200));
+                SetTextColor(hdc, ((COLORREF)(((BYTE)(200) | ((WORD)((BYTE)(200)) << 8)) | (((DWORD)(BYTE)(200)) << 16))));
             }
             SetBkMode(hdc, TRANSPARENT);
 

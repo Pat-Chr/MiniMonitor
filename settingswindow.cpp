@@ -6,7 +6,9 @@
 #include <vector>
 #include <winver.h>
 
+//fetch the variables from the config file
 void GetTextColorFromConfig(char* buffer, size_t size);
+void GetBackgroundColorFromConfig(char* buffer, size_t size);
 
 #pragma comment(lib, "Version.lib")
 
@@ -62,12 +64,19 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
+		//fetch the text and background colors from the config file
 		char colorBuffer[128] = {0};
 		GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
-
 		// Convert config text (ANSI) to a wide string for DrawTextW
 		WCHAR wColor[128] = {0};
 		MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
+
+		//fetch the background color from the config file
+		char bg_Color[128] = {0};
+		GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
+		// Convert config text (ANSI) to a wide string for DrawTextW
+		WCHAR wBgColor[128] = {0};
+		MultiByteToWideChar(CP_ACP, 0, bg_Color, -1, wBgColor, _countof(wBgColor));
 
 		std::wstring info =
 			L"Controls:\n"
@@ -78,6 +87,8 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		info += L"\nText Color: ";
 		info += wColor;
+		info += L"\nBackground Color: ";
+		info += wBgColor;
 		info += L"\n____________";
 		info += L"\n\n\nVersion: ";
 		info += GetProgramVersion();

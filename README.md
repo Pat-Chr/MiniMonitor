@@ -49,7 +49,7 @@ RAM:XX%
 ## 🗒️ Changelog
 - x1.0.2.5 - WIP
 	- Settings Window is now always on top
-	- 
+	- Background color can now be changed in the config file. RGB Values.
 - v1.0.2.4 - 2026-09-19
 	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
 	- you can now change the text color in the config file. RGB Values.
