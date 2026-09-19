@@ -46,9 +46,10 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.2.4 - unreleased
+- v1.0.2.4 - 2026-09-18
 	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
 	- you can now change the text color in the config file. (textcolor=R,G,B) where R,G,B are numbers from 0-255. (example: textcolor=255,0,0 for red)
+	- better icon
 - v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
 	- now creates a config file if it doesn't already exists. the config file does nothing so far.
