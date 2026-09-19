@@ -91,6 +91,7 @@ For next release
 
 For later
 - make settings saveable instead of editing the config file manually.
+- i will make a really really cool logo in SolidWorks someday :)
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
