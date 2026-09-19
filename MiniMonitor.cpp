@@ -49,11 +49,11 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
         RECT rect;
         GetClientRect(hWnd, &rect);
 
-        HBRUSH hBg = CreateSolidBrush(RGB(30, 30, 30));
+        HBRUSH hBg = CreateSolidBrush(RGB(0, 0, 0));
         FillRect(hdc, &rect, hBg);
         DeleteObject(hBg);
 
-        SetTextColor(hdc, RGB(200, 200, 200));
+        SetTextColor(hdc, RGB(255, 255, 255));
         SetBkMode(hdc, TRANSPARENT);
 
         char colorBuffer[128] = {0};
@@ -238,10 +238,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        // Draw Dark Background
+		// Draw Background. Color options will be added in the future. For now, it's fixed.
         RECT rect;
         GetClientRect(hWnd, &rect);
-        HBRUSH hBgBrush = CreateSolidBrush(RGB(20, 20, 20));
+        HBRUSH hBgBrush = CreateSolidBrush(RGB(0, 0, 0));
         FillRect(hdc, &rect, hBgBrush);
         DeleteObject(hBgBrush);
 
