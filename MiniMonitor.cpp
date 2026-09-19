@@ -30,7 +30,7 @@ float gpuLoad = 0.0f;
 float ramLoad = 0.0f;
 bool firstSampleTaken = false;
 
-// Forward declarations of Windows functions and update function
+// Forward declarations of update function
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);

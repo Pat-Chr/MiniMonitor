@@ -46,7 +46,7 @@ void EnsureConfigFileExists()
 
     // Wenn Datei neu erstellt wurde (GetLastError != ERROR_ALREADY_EXISTS), schreibe Inhalt
     if (GetLastError() != ERROR_ALREADY_EXISTS) {
-        const char* content = "text color=FFFFFF\r\ntest1=text\r\ntest2=text2";
+        const char* content = "text_color=FFFFFF\r\ntest1=text\r\ntest2=text2";
         DWORD written = 0;
         SetFilePointer(h, 0, NULL, FILE_BEGIN);
         WriteFile(h, content, (DWORD)strlen(content), &written, NULL);
