@@ -48,7 +48,8 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
-	- now creates a config file if it doesnt already exists. the config file does nothing so far.
+	- now creates a config file if it doesn't already exists. the config file does nothing so far.
+	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
 - v1.0.2.2 - 2026-09-18
 	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
 - v1.0.2.1 - 2026-09-18

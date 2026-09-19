@@ -27,12 +27,18 @@
     <ClInclude Include="MiniMonitor.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="readconfig.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiniMonitor.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="getdata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="readconfig.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
