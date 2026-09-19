@@ -85,6 +85,7 @@ RAM:XX%
 
 ## 🗒️ Planned features and improvements.
 For next release
+- working on a module that saves the last window position in the config file and opens the program at the last place.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
 - we really need the main loop to be in a separate cpp file. main.cpp is getting too cluttered.
 
