@@ -327,7 +327,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Position the settings window near the main window
             RECT rcMain = {};
             GetWindowRect(hWnd, &rcMain);
-            int width = 420, height = 260;
+            int width = 320, height = 300;
             int x = rcMain.left + 40;
             int y = rcMain.top + 40;
 
@@ -342,7 +342,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HWND newHwnd = CreateWindowEx(
                 WS_EX_OVERLAPPEDWINDOW,
                 className,
-                L"MiniMonitor - Settings",
+                L"Settings",
                 WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
                 x, y, width, height,
                 NULL,

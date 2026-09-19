@@ -3,16 +3,45 @@
 
 #include <windows.h>
 #include <string>
+#include <vector>
+#include <winver.h>
 
-#ifndef PROGRAM_VERSION
-// Fallback, falls PROGRAM_VERSION nicht in einem anderen Header/Projekt definiert ist.
-// Bei Bedarf hier anpassen (z.B. L"1.2.3" oder aus Ressourcen einlesen).
-#define PROGRAM_VERSION L"0.0.0"
-#endif
-
-// Prototype for function implemented elsewhere in the project that fills an ANSI buffer
-// with the configured text color (or related string). Adjust if the real signature differs.
 void GetTextColorFromConfig(char* buffer, size_t size);
+
+#pragma comment(lib, "Version.lib")
+
+static std::wstring GetProgramVersion()
+{
+	wchar_t modulePath[MAX_PATH] = {};
+	if (GetModuleFileNameW(nullptr, modulePath, _countof(modulePath)) == 0)
+		return L"Unknown";
+
+	DWORD dummy = 0;
+	DWORD versionInfoSize = GetFileVersionInfoSizeW(modulePath, &dummy);
+	if (versionInfoSize == 0)
+		return L"Unknown";
+
+	std::vector<BYTE> versionInfo(versionInfoSize);
+	if (!GetFileVersionInfoW(modulePath, 0, versionInfoSize, versionInfo.data()))
+		return L"Unknown";
+
+	VS_FIXEDFILEINFO* fileInfo = nullptr;
+	UINT fileInfoSize = 0;
+	if (!VerQueryValueW(
+		versionInfo.data(),
+		L"\\",
+		reinterpret_cast<LPVOID*>(&fileInfo),
+		&fileInfoSize) ||
+		fileInfo == nullptr)
+	{
+		return L"Unknown";
+	}
+
+	return std::to_wstring(HIWORD(fileInfo->dwFileVersionMS)) + L"." +
+		std::to_wstring(LOWORD(fileInfo->dwFileVersionMS)) + L"." +
+		std::to_wstring(HIWORD(fileInfo->dwFileVersionLS)) + L"." +
+		std::to_wstring(LOWORD(fileInfo->dwFileVersionLS));
+}
 
 LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -41,16 +70,17 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
 
 		std::wstring info =
-			L"MiniMonitor\n\n"
-			L"Controls:\n\n"
+			L"Controls:\n"
 			L" - Left click & drag: move window\n"
 			L" - Double click: close window\n"
-			L" - Right click: open this window (settings)\n\n"
-			L"Current settings: (change them by editing the config.txt)\n";
+			L" - Right click: open this window (settings)\n"
+			L"____________\n\nCurrent settings:\n(change them by editing the config.txt)";
 
-		info += L"Text Color: ";
+		info += L"\nText Color: ";
 		info += wColor;
-		info += std::wstring(L"\nVersion: ") + PROGRAM_VERSION;
+		info += L"\n____________";
+		info += L"\n\n\nVersion: ";
+		info += GetProgramVersion();
 
 		DrawTextW(hdc, info.c_str(), -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
 
