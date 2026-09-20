@@ -1,7 +1,13 @@
+// file: SaveWindowPos.cpp
 // Reads the window Position and stores it in the global variable WindowPos as a string in the format "left,top,right,bottom".
 // Not finished yet, but the function can already be called for testing purposes.
 #include <windows.h>
 #include <strsafe.h>
+#include <stdio.h>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 
 WCHAR WindowPos[256];
 
@@ -15,7 +21,6 @@ void SaveWindowPos(HWND hwnd)
         return;
     }
 
-    // Format: left,top
     StringCchPrintfW(
         WindowPos,
         _countof(WindowPos),
@@ -23,10 +28,41 @@ void SaveWindowPos(HWND hwnd)
         windowRect.left,
         windowRect.top);
 
-    // For testing purposes, display the window position in a message box
-//    MessageBoxW(
-//        nullptr,
-//        WindowPos,
-//        L"Testing WindowPos Variable",
-//        MB_OK);
+    std::ifstream inputFile("config.txt");
+    std::vector<std::string> lines;
+    std::string line;
+    bool foundWindowPos = false;
+
+    while (std::getline(inputFile, line))
+    {
+        if (line.rfind("window_pos=", 0) == 0)
+        {
+            line = "window_pos=" +
+                std::to_string(windowRect.left) + "," +
+                std::to_string(windowRect.top);
+
+            foundWindowPos = true;
+        }
+
+        lines.push_back(line);
+    }
+
+    if (!foundWindowPos)
+    {
+        lines.push_back(
+            "window_pos=" +
+            std::to_string(windowRect.left) + "," +
+            std::to_string(windowRect.top));
+    }
+
+    std::ofstream outputFile("config.txt", std::ios::trunc);
+    if (!outputFile)
+    {
+        return;
+    }
+
+    for (const std::string& outputLine : lines)
+    {
+        outputFile << outputLine << '\n';
+    }
 }

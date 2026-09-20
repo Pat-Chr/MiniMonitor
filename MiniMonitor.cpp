@@ -306,14 +306,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONDBLCLK:
         // Close window on double left-click
+
+        // Save the last window position to the config file before exiting
+        SaveWindowPos(hWnd);
+
         DestroyWindow(hWnd);
         break;
 
     case WM_RBUTTONUP:
     {
-        
-		// Temporary call to save window position on right-click (for testing)
-        SaveWindowPos(hWnd);
 
         // Open a modeless settings/info window
         const wchar_t* className = L"MiniMonitorSettings";
