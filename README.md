@@ -53,9 +53,10 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- x1.0.2.5 - WIP
-	- Now reads the current window position and creates a variable. doesn't store it yet. Loading will be implemented implemented later.
-	- The Config File now has a section for window position. Is not used so far.
+- x1.0.2.5 - 2026-09-20
+	- Now saves the last window position in the config file.
+	- The Config File now has a line for window position.
+	- When the main window opens it reads the last window position from config file and opens the window at this position.
 - v1.0.2.4 - 2026-09-19
 	- Settings Window is now always on top
 	- Background color can now be changed in the config file. RGB Values.
@@ -85,14 +86,11 @@ RAM:XX%
 	- Borderless toolwindow and basic mouse controls.
 
 ## 🗒️ Planned features and improvements.
-For next release
-- working on a module that saves the last window position in the config file and opens the program at the last place.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
-- we really need the main loop to be in a separate cpp file. main.cpp is getting too cluttered.
-
-For later
-- make settings saveable instead of editing the config file manually.
+- make settings saveable insite the settings window instead of editing the config file manually.
 - i will make a really really cool logo in SolidWorks someday :)
+- window position should check at startup if it is outside the screen and move it back to a visible position if it is.
+- Add an option to change the border of the main window to invisible or a different color.
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
