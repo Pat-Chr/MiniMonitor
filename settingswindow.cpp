@@ -90,7 +90,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		info += L"\nBackground Color: ";
 		info += wBgColor;
 		info += L"\n____________";
-		info += L"\n\n\nVersion: ";
+		info += L"\n\n\nMiniMonitor Version: ";
 		info += GetProgramVersion();
 
 		DrawTextW(hdc, info.c_str(), -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);

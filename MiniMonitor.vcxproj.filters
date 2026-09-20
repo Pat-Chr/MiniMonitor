@@ -33,6 +33,9 @@
     <ClInclude Include="settingswindow.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="SaveWindowPos.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiniMonitor.cpp">
@@ -45,6 +48,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="settingswindow.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveWindowPos.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,5 +70,6 @@
   <ItemGroup>
     <None Include="README.md" />
     <None Include=".github\copilot-instructions.md" />
+    <None Include="`SaveWindowPos.cpp`" />
   </ItemGroup>
 </Project>
