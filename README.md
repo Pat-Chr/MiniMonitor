@@ -5,6 +5,12 @@ Minimalist Windows desktop widget for real-time CPU and GPU utilization monitori
 
 ![preview](docs/images/preview_1.0.2.3.png)
 
+## General Info on this project:
+This was created by an engineer who works all day on CAD and never made a full program by himself.
+I am learning to program step by step with the help of local LLM helpers. so please don't judge me for the result. i know it will never be perfect, but every release will be 100& tested and proven working.
+I don't let the model write all the code for me, because i really want to learn something with this project, but i also won't turn down good suggestions and answers.
+ALSO i am very open for suggestions for improvements and new features.
+
 ## 🚀 Features
 - **Minimalist Design**: Small window that stays out of your way.
 - **Low Overhead**: Uses Windows Performance Data Helper (PDH) API for efficient, low-resource monitoring.
@@ -80,11 +86,13 @@ RAM:XX%
 
 ## 🗒️ Planned features and improvements.
 For next release
+- working on a module that saves the last window position in the config file and opens the program at the last place.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
 - we really need the main loop to be in a separate cpp file. main.cpp is getting too cluttered.
 
 For later
 - make settings saveable instead of editing the config file manually.
+- i will make a really really cool logo in SolidWorks someday :)
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
