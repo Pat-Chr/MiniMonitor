@@ -10,6 +10,8 @@
 #include "readconfig.h"
 #include "SaveWindowPos.h"
 #include "settingswindow.h"
+#include <fstream>
+#include <sstream>
 
 #pragma comment(lib, "pdh.lib")
 
@@ -73,6 +75,31 @@ void DisableTopBar(HWND hwnd)
 
     // In case a custom control draws a top bar, try resizing client area (optional)
     // RECT r; if (GetClientRect(hwnd, &r)) { InvalidateRect(hwnd, NULL, TRUE); UpdateWindow(hwnd); }
+}
+
+// read the window position from the config file, defaulting to (100, 100) if not found
+static POINT ReadWindowPosition()
+{
+    POINT position{ 100, 100 };
+
+    std::ifstream config("config.txt");
+    std::string line;
+
+    while (std::getline(config, line))
+    {
+        constexpr const char* prefix = "window_pos=";
+
+        if (line.rfind(prefix, 0) != 0)
+            continue;
+
+        std::stringstream values(line.substr(std::char_traits<char>::length(prefix)));
+        char separator = 0;
+
+        if (values >> position.x >> separator >> position.y && separator == ',')
+            break;
+    }
+
+    return position;
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -147,17 +174,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance;
 
+    const POINT windowPosition = ReadWindowPosition();
+
     // WS_POPUP: no border/title
     // WS_EX_TOOLWINDOW: hide from taskbar
-    // No WS_EX_TOPMOST -> window is not always-on-top
+    // WS_EX_TOPMOST: keep the monitor window above other windows
     HWND hWnd = CreateWindowExW(
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-        szWindowClass, L"",            // No title text (no help/info in title)
+        szWindowClass, L"",
         WS_POPUP | WS_BORDER,
-        100, 100, 80, 50, //dimensions
+        windowPosition.x, windowPosition.y, 80, 10,
         nullptr, nullptr, hInstance, nullptr);
 
-    if (!hWnd) return FALSE;
+    if (!hWnd)
+        return FALSE;
 
     // Remove top bar elements (menu, toolbars, status bar)
     DisableTopBar(hWnd);
