@@ -7,7 +7,7 @@ Minimalist Windows desktop widget for real-time CPU and GPU utilization monitori
 
 ## General Info on this project:
 This was created by an engineer who works all day on CAD and never made a full program by himself.
-I am learning to program step by step with the help of local LLM helpers. so please don't judge me for the result. i know it will never be perfect, but every release will be 100& tested and proven working.
+I am learning to program step by step with the help of local LLM helpers, so please don't judge me for the result. i know it will never be perfect, but every release will be 100% tested and proven working.
 I don't let the model write all the code for me, because i really want to learn something with this project, but i also won't turn down good suggestions and answers.
 ALSO i am very open for suggestions for improvements and new features.
 
@@ -55,7 +55,7 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.2.6 - WIP
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
-	- if the window is being moved, ensure it stays fully within the monitor's work area.
+	- If the window is being moved, ensure it stays fully within the monitor's work area.
 - v1.0.2.5 - 2026-09-20
 	- Now saves the last window position in the config file.
 	- The Config File now has a line for window position.
@@ -70,12 +70,12 @@ RAM:XX%
 	- the settings window now shows the program version and the current text color.
 - v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
-	- now creates a config file if it doesn't already exists. the config file does nothing so far.
+	- now creates a config file if it doesn't already exist. the config file does nothing so far.
 - v1.0.2.2 - 2026-09-18
-	- getdata functions are now in their own file. getdata.cpp The main program is more compact now.
+	- getdata functions are now in their own file "getdata.cpp". The main program is more compact now.
 - v1.0.2.1 - 2026-09-18
 	- New Icon. Chip with graph.
- 	- Added list of future plans and ideas to readme.
+ 	- Added list of future plans and ideas to the readme.
 	- Added RAM load display. Now shows CPU, GPU, and RAM utilization.
 - v1.0.2.0 — 2026-09-17
 	- Changelog section in readme was gone. fixed.
@@ -89,9 +89,9 @@ RAM:XX%
 	- Borderless toolwindow and basic mouse controls.
 
 ## 🗒️ Planned features and improvements.
-- Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
-- make settings saveable insite the settings window instead of editing the config file manually.
-- i will make a really really cool logo in SolidWorks someday :)
+- Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: haven't figured out how yet.
+- Make settings saveable inside the settings window instead of editing the config file manually.
+- I will make a really really cool logo in SolidWorks someday :)
 - Add an option to change the border of the main window to invisible or a different color.
 
 ## 📜 License
