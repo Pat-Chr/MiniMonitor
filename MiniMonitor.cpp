@@ -461,6 +461,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
 
+	// if the window is being moved, ensure it stays fully within the monitor's work area
+    case WM_MOVING:
+    {
+        RECT* windowRect = reinterpret_cast<RECT*>(lParam);
+        if (windowRect != nullptr)
+        {
+            HMONITOR monitor = MonitorFromRect(
+                windowRect,
+                MONITOR_DEFAULTTONEAREST);
+
+            MONITORINFO monitorInfo = {};
+            monitorInfo.cbSize = sizeof(monitorInfo);
+
+            if (GetMonitorInfoW(monitor, &monitorInfo))
+            {
+                const RECT& workArea = monitorInfo.rcWork;
+                const int windowWidth = windowRect->right - windowRect->left;
+                const int workAreaWidth = workArea.right - workArea.left;
+
+                if (windowWidth >= workAreaWidth)
+                {
+                    windowRect->left = workArea.left;
+                    windowRect->right = workArea.right;
+                }
+                else if (windowRect->left < workArea.left)
+                {
+                    windowRect->left = workArea.left;
+                    windowRect->right = windowRect->left + windowWidth;
+                }
+                else if (windowRect->right > workArea.right)
+                {
+                    windowRect->right = workArea.right;
+                    windowRect->left = windowRect->right - windowWidth;
+                }
+            }
+        }
+
+        return TRUE;
+    }
+
     case WM_DESTROY:
         PdhCloseQuery(cpuQuery);
         PdhCloseQuery(gpuQuery);

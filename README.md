@@ -55,6 +55,7 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.2.6 - WIP
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
+	- if the window is being moved, ensure it stays fully within the monitor's work area.
 - v1.0.2.5 - 2026-09-20
 	- Now saves the last window position in the config file.
 	- The Config File now has a line for window position.
