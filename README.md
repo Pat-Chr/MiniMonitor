@@ -53,7 +53,9 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- x1.0.2.5 - 2026-09-20
+- v1.0.2.6 - WIP
+	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
+- v1.0.2.5 - 2026-09-20
 	- Now saves the last window position in the config file.
 	- The Config File now has a line for window position.
 	- When the main window opens it reads the last window position from config file and opens the window at this position.
@@ -89,7 +91,6 @@ RAM:XX%
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: havent figured out how yet.
 - make settings saveable insite the settings window instead of editing the config file manually.
 - i will make a really really cool logo in SolidWorks someday :)
-- window position should check at startup if it is outside the screen and move it back to a visible position if it is.
 - Add an option to change the border of the main window to invisible or a different color.
 
 ## 📜 License
