@@ -8,6 +8,8 @@
 #include <windows.h>
 #include <cstring>
 #include "readconfig.h"
+#include "SaveWindowPos.h"
+#include "settingswindow.h"
 
 #pragma comment(lib, "pdh.lib")
 
@@ -36,8 +38,6 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK    InfoWndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
-
-#include "settingswindow.h"
 
 // Hide toolbar, rebar and statusbar child windows in the window
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
@@ -306,11 +306,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_LBUTTONDBLCLK:
         // Close window on double left-click
+
+        // Save the last window position to the config file before exiting
+        SaveWindowPos(hWnd);
+
         DestroyWindow(hWnd);
         break;
 
     case WM_RBUTTONUP:
     {
+
         // Open a modeless settings/info window
         const wchar_t* className = L"MiniMonitorSettings";
         HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);

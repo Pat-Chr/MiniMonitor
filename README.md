@@ -54,7 +54,8 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - x1.0.2.5 - WIP
-	- i want the window to save the last position when closed and also load it. the first try didn't work so ask me again later next week.
+  - Now reads the current window position and creates a variable. doesn't store it yet. Loading will be implemented implemented later.
+	- The Config File now has a section for window position. Is not used so far.
 - v1.0.2.4 - 2026-09-19
 	- Settings Window is now always on top
 	- Background color can now be changed in the config file. RGB Values.

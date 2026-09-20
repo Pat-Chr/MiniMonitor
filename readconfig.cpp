@@ -50,7 +50,8 @@ void EnsureConfigFileExists()
             "# MiniMonitor configuration file\n"
             "# Key=Value\n"
             "text_color=0,255,100\n"
-            "bg_color=0,0,0\n";
+            "bg_color=0,0,0\n"
+            "window_pos=100,100\n";
         DWORD written = 0;
         SetFilePointer(h, 0, NULL, FILE_BEGIN);
         WriteFile(h, content, (DWORD)strlen(content), &written, NULL);
@@ -113,7 +114,6 @@ void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
     fclose(file);
 }
 
-// this is for later use, but for now it is not used
 // Get the background color from config.txt
 void GetBackgroundColorFromConfig(char* colorBuffer, size_t bufferSize)
 {
