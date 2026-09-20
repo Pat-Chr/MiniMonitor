@@ -80,7 +80,12 @@ void DisableTopBar(HWND hwnd)
 // read the window position from the config file, defaulting to (100, 100) if not found
 static POINT ReadWindowPosition()
 {
-    POINT position{ 100, 100 };
+    constexpr POINT defaultPosition{ 100, 100 };
+    constexpr LONG windowWidth = 80;
+    constexpr LONG windowHeight = 10;
+
+    POINT position = defaultPosition;
+    bool positionFound = false;
 
     std::ifstream config("config.txt");
     std::string line;
@@ -92,14 +97,52 @@ static POINT ReadWindowPosition()
         if (line.rfind(prefix, 0) != 0)
             continue;
 
-        std::stringstream values(line.substr(std::char_traits<char>::length(prefix)));
+        std::stringstream values(
+            line.substr(std::char_traits<char>::length(prefix)));
+
         char separator = 0;
 
-        if (values >> position.x >> separator >> position.y && separator == ',')
+        if (values >> position.x >> separator >> position.y &&
+            separator == ',')
+        {
+            positionFound = true;
             break;
+        }
     }
 
-    return position;
+    if (!positionFound)
+        return defaultPosition;
+
+    RECT windowRect{
+        position.x,
+        position.y,
+        position.x + windowWidth,
+        position.y + windowHeight
+    };
+
+    // Check whether the complete window is inside a connected monitor.
+    HMONITOR monitor = MonitorFromRect(
+        &windowRect,
+        MONITOR_DEFAULTTONULL);
+
+    if (!monitor)
+        return defaultPosition;
+
+    MONITORINFO monitorInfo{};
+    monitorInfo.cbSize = sizeof(monitorInfo);
+
+    if (!GetMonitorInfoW(monitor, &monitorInfo))
+        return defaultPosition;
+
+    const RECT& screenRect = monitorInfo.rcMonitor;
+
+    const bool fullyVisible =
+        windowRect.left >= screenRect.left &&
+        windowRect.top >= screenRect.top &&
+        windowRect.right <= screenRect.right &&
+        windowRect.bottom <= screenRect.bottom;
+
+    return fullyVisible ? position : defaultPosition;
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
