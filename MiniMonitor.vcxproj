@@ -164,7 +164,6 @@
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
     <None Include="README.md" />
-    <None Include="`SaveWindowPos.cpp`" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
