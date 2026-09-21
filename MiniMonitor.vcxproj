@@ -139,6 +139,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="editsettings.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MiniMonitor.h" />
     <ClInclude Include="readconfig.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="editsettings.cpp" />
     <ClCompile Include="getdata.cpp" />
     <ClCompile Include="MiniMonitor.cpp" />
     <ClCompile Include="readconfig.cpp" />

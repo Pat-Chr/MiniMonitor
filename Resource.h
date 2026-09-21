@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Von Microsoft Visual C++ generierte Includedatei.
-// Verwendet von MiniMonitor.rc
+// Generated include file from Microsoft Visual C++.
+// Used by MiniMonitor.rc
 
 #define IDS_APP_TITLE			103
 
@@ -16,7 +16,9 @@
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
 #endif
-// Nächste Standardwerte für neue Objekte
+// Next default values for new objects
+
+#define ID_CHANGE_SETTINGS			1001
 //
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
