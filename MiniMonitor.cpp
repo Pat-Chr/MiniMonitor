@@ -428,7 +428,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Position the settings window near the main window
             RECT rcMain = {};
             GetWindowRect(hWnd, &rcMain);
-            int width = 320, height = 300;
+            int width = 320, height = 320;
             int x = rcMain.left + 40;
             int y = rcMain.top + 40;
 

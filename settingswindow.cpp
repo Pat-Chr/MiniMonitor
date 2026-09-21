@@ -58,7 +58,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_CREATE:
 		CreateWindowW(
 			L"BUTTON",
-			L"Change settings",
+			L"Edit Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 			10, 10, 130, 25,
 			hWnd,
@@ -83,7 +83,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			MoveWindow(
 				button,
 				rect.right - buttonWidth - margin,
-				rect.bottom - buttonHeight - margin,
+				margin,
 				buttonWidth,
 				buttonHeight,
 				TRUE);
@@ -141,7 +141,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			_countof(wBgColor));
 
 		std::wstring info =
-			L"Controls:\n"
+			L"\n\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
