@@ -80,7 +80,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		std::wstring info =
 			L"Controls:\n"
-			L" - Left click & drag: move window\n"
+			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
 			L"____________\n\nCurrent settings:\n(change them by editing the config.txt)";

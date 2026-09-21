@@ -372,9 +372,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_LBUTTONDOWN:
-        // Allow dragging the borderless window by treating client clicks as caption drags
-        ReleaseCapture();
-        SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+        // Only allow dragging if SHIFT is held down to prevent accidental moves
+        if (GetKeyState(VK_SHIFT) & 0x8000) {
+            ReleaseCapture();
+            SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+        }
         break;
 
     case WM_LBUTTONDBLCLK:

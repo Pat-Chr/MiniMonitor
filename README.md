@@ -54,6 +54,7 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.2.6 - WIP
+	- Dragging now requires SHIFT key to be held down to prevent accidental moves.
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
 	- If the window is being moved, ensure it stays fully within the monitor's work area.
 - v1.0.2.5 - 2026-09-20
