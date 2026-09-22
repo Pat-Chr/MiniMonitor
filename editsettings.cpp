@@ -236,15 +236,39 @@ void OpenChangeSettingsWindow(HWND owner)
 	POINT cursorPosition;
 	GetCursorPos(&cursorPosition);
 
+	// Get screen dimensions to ensure window stays within bounds
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	// Window size constants
+	const int windowWidth = 300;
+	const int windowHeight = 200;
+
+	// Calculate position to keep window fully within screen
+	int x = cursorPosition.x;
+	int y = cursorPosition.y;
+
+	// Adjust if window would extend beyond right edge
+	if (x + windowWidth > screenWidth)
+	{
+		x = screenWidth - windowWidth - 10; // Leave some margin from right edge
+	}
+
+	// Adjust if window would extend beyond bottom edge
+	if (y + windowHeight > screenHeight)
+	{
+		y = screenHeight - windowHeight - 10; // Leave some margin from bottom edge
+	}
+
 	g_changeSettingsWindow = CreateWindowExW(
 		0,
 		L"MiniMonitorChangeSettingsWindow",
 		L"Change settings",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-		cursorPosition.x,
-		cursorPosition.y,
-		300,
-		200,
+		x,
+		y,
+		windowWidth,
+		windowHeight,
 		owner,
 		nullptr,
 		GetModuleHandleW(nullptr),
