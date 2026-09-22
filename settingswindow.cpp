@@ -1,12 +1,12 @@
 // settingswindow.cpp
-// Info window procedure for showing controls / settings
+// Info window procedure for showing controls and current settings.
 
 #include <windows.h>
 #include <string>
 #include <vector>
 #include <winver.h>
 
-#include "resource.h" // statt "resource_ids.h"
+#include "resource.h" // Instead of "resource_ids.h"
 #include "readconfig.h"
 #include "editsettings.h"
 
@@ -14,9 +14,11 @@
 
 namespace
 {
+	// Tracks the settings window instance managed by the application.
 	HWND g_changeSettingsWindow = nullptr;
 }
 
+// Retrieves the file version embedded in the running executable.
 static std::wstring GetProgramVersion()
 {
 	wchar_t modulePath[MAX_PATH] = {};
@@ -50,12 +52,12 @@ static std::wstring GetProgramVersion()
 		std::to_wstring(LOWORD(fileInfo->dwFileVersionLS));
 }
 
-
 LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case WM_CREATE:
+		// Create the button used to open the editable settings window.
 		CreateWindowW(
 			L"BUTTON",
 			L"Edit Settings",
@@ -69,6 +71,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 	case WM_SIZE:
 	{
+		// Keep the button aligned with the top-right corner when the window is resized.
 		HWND button = GetDlgItem(hWnd, ID_CHANGE_SETTINGS);
 
 		if (button != nullptr)
@@ -93,6 +96,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 
 	case WM_COMMAND:
+		// Open the settings editor when the button is clicked.
 		if (LOWORD(wParam) == ID_CHANGE_SETTINGS &&
 			HIWORD(wParam) == BN_CLICKED)
 		{
@@ -109,13 +113,16 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		RECT rect;
 		GetClientRect(hWnd, &rect);
 
+		// Paint the information window background black.
 		HBRUSH hBg = CreateSolidBrush(RGB(0, 0, 0));
 		FillRect(hdc, &rect, hBg);
 		DeleteObject(hBg);
 
+		// Configure white, transparent text so the black background remains visible.
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
+		// Read and convert the configured text color to Unicode for display.
 		char colorBuffer[128] = { 0 };
 		GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
 
@@ -128,6 +135,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			wColor,
 			_countof(wColor));
 
+		// Read and convert the configured background color to Unicode for display.
 		char bg_Color[128] = { 0 };
 		GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
 
@@ -140,6 +148,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			wBgColor,
 			_countof(wBgColor));
 
+		// Build the help text and append the currently active settings.
 		std::wstring info =
 			L"\n\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
@@ -155,6 +164,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		info += L"\n\n\nMiniMonitor Version: ";
 		info += GetProgramVersion();
 
+		// Draw the text with word wrapping inside the client area.
 		DrawTextW(
 			hdc,
 			info.c_str(),
@@ -167,10 +177,12 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 
 	case WM_CLOSE:
+		// Destroy the window when the user closes it.
 		DestroyWindow(hWnd);
 		return 0;
 
 	case WM_DESTROY:
+		// No additional cleanup is currently required for this window.
 		return 0;
 
 	default:

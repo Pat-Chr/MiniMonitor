@@ -338,12 +338,15 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
 void OpenChangeSettingsWindow(HWND owner)
 {
+    // If the settings window is already open, bring it to the foreground instead
+    // of creating a second instance.
     if (g_changeSettingsWindow != nullptr)
     {
         SetForegroundWindow(g_changeSettingsWindow);
         return;
     }
 
+    // Register the window class only once during the application's lifetime.
     static bool classRegistered = false;
 
     if (!classRegistered)
@@ -359,31 +362,31 @@ void OpenChangeSettingsWindow(HWND owner)
         classRegistered = true;
     }
 
+    // Use the current cursor position as the initial window location.
     POINT cursorPosition;
     GetCursorPos(&cursorPosition);
 
-    // Get screen dimensions to ensure window stays within bounds
+    // Get the primary screen dimensions so the window can be kept visible.
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    // Window size constants
+    // Define the desired dimensions of the settings window.
     const int windowWidth = 300;
     const int windowHeight = 200;
 
-    // Calculate position to keep window fully within screen
     int x = cursorPosition.x;
     int y = cursorPosition.y;
 
-    // Adjust if window would extend beyond right edge
+    // Move the window left if it would extend past the right screen edge.
     if (x + windowWidth > screenWidth)
     {
-        x = screenWidth - windowWidth - 10; // Leave some margin from right edge
+        x = screenWidth - windowWidth - 10;
     }
 
-    // Adjust if window would extend beyond bottom edge
+    // Move the window up if it would extend past the bottom screen edge.
     if (y + windowHeight > screenHeight)
     {
-        y = screenHeight - windowHeight - 10; // Leave some margin from bottom edge
+        y = screenHeight - windowHeight - 10;
     }
 
     g_changeSettingsWindow = CreateWindowExW(
@@ -402,14 +405,16 @@ void OpenChangeSettingsWindow(HWND owner)
 
     if (g_changeSettingsWindow != nullptr)
     {
+        // Display the window before initializing its controls.
         ShowWindow(g_changeSettingsWindow, SW_SHOW);
         UpdateWindow(g_changeSettingsWindow);
 
-        // Load current settings from config file into edit controls
+        // Load the configured text color and populate its edit control.
         char textColorBuffer[256] = {};
         GetTextColorFromConfig(textColorBuffer, sizeof(textColorBuffer));
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_TEXT_COLOR_EDIT), textColorBuffer);
 
+        // Load the configured background color and populate its edit control.
         char bgColorBuffer[256] = {};
         GetBackgroundColorFromConfig(bgColorBuffer, sizeof(bgColorBuffer));
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_BG_COLOR_EDIT), bgColorBuffer);
