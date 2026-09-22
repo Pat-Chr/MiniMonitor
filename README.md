@@ -53,7 +53,8 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.2.6 - WIP
+- v1.0.2.6 - 2026-09-21
+	- Change settings button added for easier access to settings. Opens a separate dialog window.
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
 	- If the window is being moved, ensure it stays fully within the monitor's work area.

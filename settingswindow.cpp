@@ -6,11 +6,16 @@
 #include <vector>
 #include <winver.h>
 
-//fetch the variables from the config file
-void GetTextColorFromConfig(char* buffer, size_t size);
-void GetBackgroundColorFromConfig(char* buffer, size_t size);
+#include "resource.h" // statt "resource_ids.h"
+#include "readconfig.h"
+#include "editsettings.h"
 
 #pragma comment(lib, "Version.lib")
+
+namespace
+{
+	HWND g_changeSettingsWindow = nullptr;
+}
 
 static std::wstring GetProgramVersion()
 {
@@ -45,10 +50,57 @@ static std::wstring GetProgramVersion()
 		std::to_wstring(LOWORD(fileInfo->dwFileVersionLS));
 }
 
+
 LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+	case WM_CREATE:
+		CreateWindowW(
+			L"BUTTON",
+			L"Edit Settings",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			10, 10, 130, 25,
+			hWnd,
+			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
+			GetModuleHandleW(nullptr),
+			nullptr);
+		return 0;
+
+	case WM_SIZE:
+	{
+		HWND button = GetDlgItem(hWnd, ID_CHANGE_SETTINGS);
+
+		if (button != nullptr)
+		{
+			RECT rect;
+			GetClientRect(hWnd, &rect);
+
+			const int buttonWidth = 130;
+			const int buttonHeight = 25;
+			const int margin = 10;
+
+			MoveWindow(
+				button,
+				rect.right - buttonWidth - margin,
+				margin,
+				buttonWidth,
+				buttonHeight,
+				TRUE);
+		}
+
+		return 0;
+	}
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == ID_CHANGE_SETTINGS &&
+			HIWORD(wParam) == BN_CLICKED)
+		{
+			OpenChangeSettingsWindow(hWnd);
+			return 0;
+		}
+		break;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -64,26 +116,36 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
-		//fetch the text and background colors from the config file
-		char colorBuffer[128] = {0};
+		char colorBuffer[128] = { 0 };
 		GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
-		// Convert config text (ANSI) to a wide string for DrawTextW
-		WCHAR wColor[128] = {0};
-		MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
 
-		//fetch the background color from the config file
-		char bg_Color[128] = {0};
+		WCHAR wColor[128] = { 0 };
+		MultiByteToWideChar(
+			CP_ACP,
+			0,
+			colorBuffer,
+			-1,
+			wColor,
+			_countof(wColor));
+
+		char bg_Color[128] = { 0 };
 		GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
-		// Convert config text (ANSI) to a wide string for DrawTextW
-		WCHAR wBgColor[128] = {0};
-		MultiByteToWideChar(CP_ACP, 0, bg_Color, -1, wBgColor, _countof(wBgColor));
+
+		WCHAR wBgColor[128] = { 0 };
+		MultiByteToWideChar(
+			CP_ACP,
+			0,
+			bg_Color,
+			-1,
+			wBgColor,
+			_countof(wBgColor));
 
 		std::wstring info =
-			L"Controls:\n"
+			L"\n\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
-			L"____________\n\nCurrent settings:\n(change them by editing the config.txt)";
+			L"____________\n\nCurrent settings:\n";
 
 		info += L"\nText Color: ";
 		info += wColor;
@@ -93,18 +155,22 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		info += L"\n\n\nMiniMonitor Version: ";
 		info += GetProgramVersion();
 
-		DrawTextW(hdc, info.c_str(), -1, &rect, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
+		DrawTextW(
+			hdc,
+			info.c_str(),
+			-1,
+			&rect,
+			DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
 
 		EndPaint(hWnd, &ps);
+		return 0;
 	}
-	return 0;
 
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
 		return 0;
 
 	case WM_DESTROY:
-		// Child/settings window: do not call PostQuitMessage
 		return 0;
 
 	default:
