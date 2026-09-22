@@ -145,8 +145,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
-			L"____________\n\nCurrent settings:\n"
-			L"(change them by editing the config.txt)";
+			L"____________\n\nCurrent settings:\n";
 
 		info += L"\nText Color: ";
 		info += wColor;

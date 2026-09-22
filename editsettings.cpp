@@ -6,6 +6,7 @@
 #include <vector>
 #include <winver.h>
 #include <commdlg.h>
+#include <fstream>
 
 #pragma comment(lib, "Version.lib")
 #pragma comment(lib, "comdlg32.lib")
@@ -261,64 +262,57 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
         case ID_SAVE:
         {
-            // Read text color from edit control
             char textColor[256] = {};
-            GetWindowTextA(GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT), textColor, sizeof(textColor));
+            GetWindowTextA(
+                GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT),
+                textColor,
+                sizeof(textColor));
 
-            // Read background color from edit control
             char bgColor[256] = {};
-            GetWindowTextA(GetDlgItem(hWnd, ID_BG_COLOR_EDIT), bgColor, sizeof(bgColor));
+            GetWindowTextA(
+                GetDlgItem(hWnd, ID_BG_COLOR_EDIT),
+                bgColor,
+                sizeof(bgColor));
 
-            // Save to config file
-            const char* name = "config.txt";
-            char path[MAX_PATH] = { 0 };
-            char mod[MAX_PATH] = { 0 };
-            if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0)
+            std::ifstream inputFile("config.txt");
+            std::vector<std::string> lines;
+            std::string line;
+            bool foundTextColor = false;
+            bool foundBgColor = false;
+
+            while (std::getline(inputFile, line))
             {
-                char* p = strrchr(mod, '\\');
-                if (p)
+                if (line.rfind("text_color=", 0) == 0)
                 {
-                    *++p = '\0';
-                    strcpy_s(path, sizeof(path), mod);
-                    strcat_s(path, sizeof(path), name);
+                    line = "text_color=" + std::string(textColor);
+                    foundTextColor = true;
                 }
-                else
+                else if (line.rfind("bg_color=", 0) == 0)
                 {
-                    strcpy_s(path, sizeof(path), name);
+                    line = "bg_color=" + std::string(bgColor);
+                    foundBgColor = true;
                 }
-            }
-            else
-            {
-                GetCurrentDirectoryA(MAX_PATH, path);
-                size_t len = strlen(path);
-                if (len && path[len - 1] != '\\') strcat_s(path, sizeof(path), "\\");
-                strcat_s(path, sizeof(path), name);
+
+                lines.push_back(line);
             }
 
-            HANDLE hFile = CreateFileA(
-                path,
-                GENERIC_WRITE,
-                0,
-                NULL,
-                OPEN_ALWAYS,
-                FILE_ATTRIBUTE_NORMAL,
-                NULL);
-
-            if (hFile != INVALID_HANDLE_VALUE)
+            if (!foundTextColor)
             {
-                SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+                lines.push_back("text_color=" + std::string(textColor));
+            }
 
-                // Write text_color line
-                char writeBuffer[256];
-                sprintf_s(writeBuffer, "text_color=%s\n", textColor);
-                DWORD written = 0;
-                WriteFile(hFile, writeBuffer, (DWORD)strlen(writeBuffer), &written, NULL);
+            if (!foundBgColor)
+            {
+                lines.push_back("bg_color=" + std::string(bgColor));
+            }
 
-                // Write bg_color line
-                sprintf_s(writeBuffer, "bg_color=%s\n", bgColor);
-                WriteFile(hFile, writeBuffer, (DWORD)strlen(writeBuffer), &written, NULL);
-
-                CloseHandle(hFile);
+            std::ofstream outputFile("config.txt", std::ios::trunc);
+            if (outputFile)
+            {
+                for (const std::string& outputLine : lines)
+                {
+                    outputFile << outputLine << '\n';
+                }
             }
 
             DestroyWindow(hWnd);
