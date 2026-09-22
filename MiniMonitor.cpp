@@ -480,22 +480,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 const RECT& workArea = monitorInfo.rcWork;
                 const int windowWidth = windowRect->right - windowRect->left;
+                const int windowHeight = windowRect->bottom - windowRect->top;
                 const int workAreaWidth = workArea.right - workArea.left;
+                const int workAreaHeight = workArea.bottom - workArea.top;
+                constexpr int margin = 5;
 
+                // Handle horizontal constraints (left/right)
                 if (windowWidth >= workAreaWidth)
                 {
-                    windowRect->left = workArea.left;
-                    windowRect->right = workArea.right;
+                    windowRect->left = workArea.left + margin;
+                    windowRect->right = workArea.right - margin;
                 }
-                else if (windowRect->left < workArea.left)
+                else if (windowRect->left < workArea.left + margin)
                 {
-                    windowRect->left = workArea.left;
+                    windowRect->left = workArea.left + margin;
                     windowRect->right = windowRect->left + windowWidth;
                 }
-                else if (windowRect->right > workArea.right)
+                else if (windowRect->right > workArea.right - margin)
                 {
-                    windowRect->right = workArea.right;
+                    windowRect->right = workArea.right - margin;
                     windowRect->left = windowRect->right - windowWidth;
+                }
+
+                // Handle vertical constraints (top/bottom)
+                if (windowHeight >= workAreaHeight)
+                {
+                    windowRect->top = workArea.top + margin;
+                    windowRect->bottom = workArea.bottom - margin;
+                }
+                else if (windowRect->top < workArea.top + margin)
+                {
+                    windowRect->top = workArea.top + margin;
+                    windowRect->bottom = windowRect->top + windowHeight;
+                }
+                else if (windowRect->bottom > workArea.bottom - margin)
+                {
+                    windowRect->bottom = workArea.bottom - margin;
+                    windowRect->top = windowRect->bottom - windowHeight;
                 }
             }
         }
