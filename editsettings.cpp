@@ -181,7 +181,13 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         case ID_TEXT_COLOR_PICKER:
         {
             CHOOSECOLOR cc = {};
-            COLORREF customColors[16] = {};
+            COLORREF customColors[16] = {
+            RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255), RGB(255, 255, 0),
+            RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 255), RGB(192, 192, 192),
+            RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
+            RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
+            };
+
             COLORREF initialColor = RGB(0, 0, 0);
 
             // Try to parse current text color
@@ -216,7 +222,12 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         case ID_BG_COLOR_PICKER:
         {
             CHOOSECOLOR cc = {};
-            COLORREF customColors[16] = {};
+            COLORREF customColors[16] = {
+            RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255), RGB(255, 255, 0),
+            RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 255), RGB(192, 192, 192),
+            RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
+            RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
+            };
             COLORREF initialColor = RGB(255, 255, 255);
 
             // Try to parse current background color
