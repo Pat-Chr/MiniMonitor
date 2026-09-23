@@ -92,9 +92,13 @@ RAM:XX%
 
 ## 🗒️ Planned features and improvements.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: haven't figured out how yet.
-- Make settings saveable inside the settings window instead of editing the config file manually.
 - I will make a really really cool logo in SolidWorks someday :)
 - Add an option to change the border of the main window to invisible or a different color.
+
+## Known Bugs and Issues.
+- GPU meter adds the video decoder value to the overall percentage of the GPU. In theory it can reach over 100%. It will still stick to max 100% because of how the number is handeled.
+- Saving the changes does not affect the settings/info window until you reopen it.
+- The main loop reads the config file every tick. Which is just a sloppy solution. Can be done better.
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
