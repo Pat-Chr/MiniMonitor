@@ -51,19 +51,17 @@ void UpdatePerformanceData()
                 PDH_FMT_COUNTERVALUE_ITEM_W* items = reinterpret_cast<PDH_FMT_COUNTERVALUE_ITEM_W*>(buffer.data());
                 PDH_STATUS s2 = PdhGetFormattedCounterArrayW(gpuCounter, PDH_FMT_DOUBLE, &bufferSize, &itemCount, items);
                 if (s2 == ERROR_SUCCESS && itemCount > 0) {
-                    double sum = 0.0;
-                    DWORD validCount = 0;
+                    double maxVal = 0.0;
                     for (DWORD i = 0; i < itemCount; ++i) {
                         if (items[i].FmtValue.CStatus == ERROR_SUCCESS) {
-                            sum += items[i].FmtValue.doubleValue;
-                            ++validCount;
+                            double val = items[i].FmtValue.doubleValue;
+                            if (val > maxVal) {
+                                maxVal = val;
+                            }
                         }
                     }
-                    if (validCount > 0) {
-                        // Aggregate engine utilizations; clamp to 0-100.
-                        double val = std::clamp(sum, 0.0, 100.0);
-                        gpuLoad = static_cast<float>(val);
-                    }
+                    // Pick highest engine utilization; clamp to 0-100.
+                    gpuLoad = static_cast<float>(std::clamp(maxVal, 0.0, 100.0));
                 }
             }
             else if (s == ERROR_SUCCESS) {
