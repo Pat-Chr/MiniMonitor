@@ -6,10 +6,10 @@ Minimalist Windows desktop widget for real-time CPU and GPU utilization monitori
 ![preview](docs/images/preview_1.0.2.3.png)
 
 ## General Info on this project:
-This was created by an engineer who works all day on CAD and never made a full program by himself.
+This was created by an engineer who works on CAD all day and never made a full program by himself.
 I am learning to program step by step with the help of local LLM helpers, so please don't judge me for the result. i know it will never be perfect, but every release will be 100% tested and proven working.
 I don't let the model write all the code for me, because i really want to learn something with this project, but i also won't turn down good suggestions and answers.
-ALSO i am very open for suggestions for improvements and new features.
+ALSO i am very open for ideas on improvements and new features.
 
 ## 🚀 Features
 - **Minimalist Design**: Small window that stays out of your way.
@@ -95,11 +95,14 @@ RAM:XX%
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: haven't figured out how yet.
 - I will make a really really cool logo in SolidWorks someday :)
 - Add an option to change the border of the main window to invisible or a different color.
+- Add a transparency option. (This is a bit harder because it also causes the text to be transparent as well)
+- Option checkboxes to turn on and off some of the meters. example "show memory" [x]
+- Idea for faster refresh and a speed option, but i have to test how the code behaves if i go too far. The goal would be 30Hz.
 
 ## Known Bugs and Issues.
-- GPU meter adds the video decoder value to the overall percentage of the GPU. In theory it can reach over 100%. It will still stick to max 100% because of how the number is handeled.
 - Saving the changes does not affect the settings/info window until you reopen it.
 - The main loop reads the config file every tick. Which is just a sloppy solution. Can be done better.
+- Sometimes when playing a game you accidantly drag on the MiniMeter window instead and this causes the camera movement of the game to get ignored.
 
 ## 📜 License
 All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
