@@ -29,7 +29,7 @@ RAM:XX%
 ## 🖱️ Controls
 | Action | Result |
 | :--- | :--- |
-| **Left Click & Drag** | Move the widget around your screen |
+| **SHIFT + Left Click & Drag** | Move the widget around your screen |
 | **Double Click** | Close the widget |
 | **Right Click** | Open Info/Settings window |
 
