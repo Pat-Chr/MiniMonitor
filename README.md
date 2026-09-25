@@ -105,4 +105,17 @@ RAM:XX%
 - Sometimes when playing a game you accidantly drag on the MiniMeter window instead and this causes the camera movement of the game to get ignored.
 
 ## 📜 License
-All rights reserved. This project is for personal use only and may not be redistributed or used commercially without permission.
+Copyright (c) 2026 Patrick CHriste]
+
+This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
+
+You are free to:
+- Share: Copy and redistribute the material in any medium or format.
+- Adapt: Remix, transform, and build upon the material.
+
+Under the following terms:
+- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+- NonCommercial: You may not use the material for commercial purposes.
+
+To view a copy of this license, visit:
+https://creativecommons.org
