@@ -58,7 +58,7 @@ RAM:XX%
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
 	- If the window is being moved, ensure it stays fully within the monitor's work area.
-	- Bugfix: if video is being decoded while gpu compute is used at same time the value does not get added together anymore. instead it now picks the higher value of the two. 
+	- Bugfix: if video is being decoded while gpu compute is used at same time the value does not get added together anymore. instead it now picks the larger value of the two. 
 - v1.0.2.5 - 2026-09-20
 	- Now saves the last window position in the config file.
 	- The Config File now has a line for window position.
