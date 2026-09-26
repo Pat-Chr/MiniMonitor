@@ -291,13 +291,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::vector<std::wstring> lines;
         wchar_t tmp[128];
 
-        // Existing lines
+		// Adding lines one by one, using swprintf_s to format the text
         swprintf_s(tmp, _countof(tmp), L"CPU:%0.0f%%", cpuLoad);
         lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"GPU:%0.0f%%", gpuLoad);
         lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
         lines.emplace_back(tmp);
+
+		//Testing new option. Lines can also be hidden by usind a bool in the config file.
+		bool showTestLine = false; // This would be read from the config file in a real scenario
+        if (showTestLine) {
+            swprintf_s(tmp, _countof(tmp), L"Testline");
+            lines.emplace_back(tmp);
+        }
 
         // Example of adding another line (commented out) — uncomment or add more as needed
         // swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);

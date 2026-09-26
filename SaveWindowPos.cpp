@@ -1,6 +1,5 @@
 // file: SaveWindowPos.cpp
-// Reads the window Position and stores it in the global variable WindowPos as a string in the format "left,top,right,bottom".
-// Not finished yet, but the function can already be called for testing purposes.
+// Reads the window Position and stores it in the global variable WindowPos as a string in the format "left,top".
 #include <windows.h>
 #include <strsafe.h>
 #include <stdio.h>
@@ -11,7 +10,7 @@
 
 /**
  * Global buffer to store window position data.
- * Format: "left,top,right,bottom" (as a string)
+ * Format: "left,top" (as a string)
  * Maximum size: 256 characters
  */
 WCHAR WindowPos[256];
@@ -23,14 +22,11 @@ WCHAR WindowPos[256];
  * 
  * @remarks
  * - Retrieves the window rectangle using GetWindowRect()
- * - Stores only left and top coordinates in WindowPos buffer (right/bottom not yet implemented)
+ * - Stores left and top coordinates in WindowPos buffer
  * - Reads existing config.txt, updates window_pos line with new values
  * - Writes updated content back to config.txt (truncating previous content)
  * 
  * @returns void
- * 
- * @note This function is incomplete - only left/top coordinates are saved.
- *       The right/bottom coordinates mentioned in the header are not yet implemented.
  */
 void SaveWindowPos(HWND hwnd)
 {
