@@ -36,6 +36,12 @@
     <ClInclude Include="SaveWindowPos.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="editsettings.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="saveasetting.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiniMonitor.cpp">
@@ -51,6 +57,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="SaveWindowPos.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="editsettings.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="saveasetting.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

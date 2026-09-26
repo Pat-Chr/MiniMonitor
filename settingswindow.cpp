@@ -9,6 +9,12 @@
 #include "resource.h" // Instead of "resource_ids.h"
 #include "readconfig.h"
 #include "editsettings.h"
+#include "saveasetting.h"
+
+// Global function to save a setting to the configuration file. Can be used for any setting.
+void SaveASetting(const std::wstring& key, const std::wstring& value);
+// Example usage: SaveASetting(L"settingName", L"settingValue");
+// Keep it in here. Is not used right now, but can be later on.
 
 #pragma comment(lib, "Version.lib")
 
