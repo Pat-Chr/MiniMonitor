@@ -7,6 +7,11 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include "saveasetting.h"
+
+// Global function to save a setting to the configuration file. Can be used for any setting.
+void SaveASetting(const std::wstring& key, const std::wstring& value);
+// Example usage: SaveASetting(L"settingName", L"settingValue");
 
 /**
  * Global buffer to store window position data.
@@ -23,8 +28,6 @@ WCHAR WindowPos[256];
  * @remarks
  * - Retrieves the window rectangle using GetWindowRect()
  * - Stores left and top coordinates in WindowPos buffer
- * - Reads existing config.txt, updates window_pos line with new values
- * - Writes updated content back to config.txt (truncating previous content)
  * 
  * @returns void
  */
@@ -50,53 +53,6 @@ void SaveWindowPos(HWND hwnd)
         windowRect.left,
         windowRect.top);
 
-    // Open existing configuration file for reading
-    std::ifstream inputFile("config.txt");
-    std::vector<std::string> lines;
-    std::string line;
-    bool foundWindowPos = false;
-
-    // Read all lines from the configuration file
-    while (std::getline(inputFile, line))
-    {
-        // Check if this line is the window position entry
-        if (line.rfind("window_pos=", 0) == 0)
-        {
-            // Replace existing window_pos line with updated coordinates
-            line = "window_pos=" +
-                std::to_string(windowRect.left) + "," +
-                std::to_string(windowRect.top);
-
-            // Mark that we found and updated the window position entry
-            foundWindowPos = true;
-        }
-
-        // Store all lines (including modified ones) for later writing
-        lines.push_back(line);
-    }
-
-    // If window_pos line was not found, add a new one with current coordinates
-    if (!foundWindowPos)
-    {
-        lines.push_back(
-            "window_pos=" +
-            std::to_string(windowRect.left) + "," +
-            std::to_string(windowRect.top));
-    }
-
-    // Open configuration file for writing (truncates existing content)
-    std::ofstream outputFile("config.txt", std::ios::trunc);
-    if (!outputFile)
-    {
-        // Failed to open file for writing - cannot proceed
-        return;
-    }
-
-    // Write all lines back to the configuration file
-    for (const std::string& outputLine : lines)
-    {
-        outputFile << outputLine << '\n';
-    }
-
-    // Close files automatically when they go out of scope
+    // Use SaveASetting() from saveasetting.h
+    SaveASetting(L"window_pos", WindowPos);
 }
