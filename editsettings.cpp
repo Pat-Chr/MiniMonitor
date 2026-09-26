@@ -20,39 +20,6 @@ void SaveASetting(const std::wstring& key, const std::wstring& value);
 void GetTextColorFromConfig(char* buffer, size_t size);
 void GetBackgroundColorFromConfig(char* buffer, size_t size);
 
-static std::wstring GetProgramVersion()
-{
-    wchar_t modulePath[MAX_PATH] = {};
-    if (GetModuleFileNameW(nullptr, modulePath, _countof(modulePath)) == 0)
-        return L"Unknown";
-
-    DWORD dummy = 0;
-    DWORD versionInfoSize = GetFileVersionInfoSizeW(modulePath, &dummy);
-    if (versionInfoSize == 0)
-        return L"Unknown";
-
-    std::vector<BYTE> versionInfo(versionInfoSize);
-    if (!GetFileVersionInfoW(modulePath, 0, versionInfoSize, versionInfo.data()))
-        return L"Unknown";
-
-    VS_FIXEDFILEINFO* fileInfo = nullptr;
-    UINT fileInfoSize = 0;
-    if (!VerQueryValueW(
-        versionInfo.data(),
-        L"\\",
-        reinterpret_cast<LPVOID*>(&fileInfo),
-        &fileInfoSize) ||
-        fileInfo == nullptr)
-    {
-        return L"Unknown";
-    }
-
-    return std::to_wstring(HIWORD(fileInfo->dwFileVersionMS)) + L"." +
-        std::to_wstring(LOWORD(fileInfo->dwFileVersionMS)) + L"." +
-        std::to_wstring(HIWORD(fileInfo->dwFileVersionLS)) + L"." +
-        std::to_wstring(LOWORD(fileInfo->dwFileVersionLS));
-}
-
 constexpr int ID_CHANGE_SETTINGS = 1001;
 constexpr int ID_SAVE = 1002;
 constexpr int ID_CANCEL = 1003;
