@@ -11,6 +11,11 @@
 #pragma comment(lib, "Version.lib")
 #pragma comment(lib, "comdlg32.lib")
 
+#include "saveasetting.h";
+// Global function to save a setting to the configuration file. Can be used for any setting.
+void SaveASetting(const std::wstring& key, const std::wstring& value);
+// Example usage: SaveASetting(L"settingName", L"settingValue");
+
 //fetch the variables from the config file
 void GetTextColorFromConfig(char* buffer, size_t size);
 void GetBackgroundColorFromConfig(char* buffer, size_t size);
@@ -377,13 +382,13 @@ void OpenChangeSettingsWindow(HWND owner)
     int x = cursorPosition.x;
     int y = cursorPosition.y;
 
-    // Move the window left if it would extend past the right screen edge.
+    // Move the window left if it extends past the right screen edge.
     if (x + windowWidth > screenWidth)
     {
         x = screenWidth - windowWidth - 10;
     }
 
-    // Move the window up if it would extend past the bottom screen edge.
+    // Move the window up if it extends past the bottom screen edge.
     if (y + windowHeight > screenHeight)
     {
         y = screenHeight - windowHeight - 10;
