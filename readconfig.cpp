@@ -1,5 +1,6 @@
 // readconfig.cpp
 // reads the config file and creates the necessary variables for the program to use
+// Also creates the config file and gives it the standard values.
 
 #include <windows.h>
 #include <cstdio>

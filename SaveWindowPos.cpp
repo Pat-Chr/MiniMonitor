@@ -45,7 +45,6 @@ void SaveWindowPos(HWND hwnd)
     }
 
     // Format the window position as a string in "left,top" format
-    // Note: right and bottom coordinates are not yet included (future enhancement)
     StringCchPrintfW(
         WindowPos,
         _countof(WindowPos),

@@ -54,8 +54,8 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.3.0 - WIP
-	- New function for global saving of settings. We dont have to create a new function everytime. (works)
-	- Next planned: change all the other settings to use this new function. (text color, background color, window position)
+	- New function for global saving of settings. We don't have to create a new function everytime. (works)
+	- All the current settings use the new unified save function now.
 - v1.0.2.6 - 2026-09-21
 	- Change settings button added for easier access to settings. Opens a separate dialog window.
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.

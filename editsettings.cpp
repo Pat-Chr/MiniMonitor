@@ -265,60 +265,23 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             return 0;
         }
 
+        // Save button reads the chosen values and saves them using SaveASetting()
         case ID_SAVE:
         {
-            char textColor[256] = {};
-            GetWindowTextA(
+            wchar_t textColor[256] = {};
+            GetWindowTextW(
                 GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT),
                 textColor,
-                sizeof(textColor));
+                sizeof(textColor) / sizeof(wchar_t));
 
-            char bgColor[256] = {};
-            GetWindowTextA(
+            wchar_t bgColor[256] = {};
+            GetWindowTextW(
                 GetDlgItem(hWnd, ID_BG_COLOR_EDIT),
                 bgColor,
-                sizeof(bgColor));
+                sizeof(bgColor) / sizeof(wchar_t));
 
-            std::ifstream inputFile("config.txt");
-            std::vector<std::string> lines;
-            std::string line;
-            bool foundTextColor = false;
-            bool foundBgColor = false;
-
-            while (std::getline(inputFile, line))
-            {
-                if (line.rfind("text_color=", 0) == 0)
-                {
-                    line = "text_color=" + std::string(textColor);
-                    foundTextColor = true;
-                }
-                else if (line.rfind("bg_color=", 0) == 0)
-                {
-                    line = "bg_color=" + std::string(bgColor);
-                    foundBgColor = true;
-                }
-
-                lines.push_back(line);
-            }
-
-            if (!foundTextColor)
-            {
-                lines.push_back("text_color=" + std::string(textColor));
-            }
-
-            if (!foundBgColor)
-            {
-                lines.push_back("bg_color=" + std::string(bgColor));
-            }
-
-            std::ofstream outputFile("config.txt", std::ios::trunc);
-            if (outputFile)
-            {
-                for (const std::string& outputLine : lines)
-                {
-                    outputFile << outputLine << '\n';
-                }
-            }
+            SaveASetting(L"text_color", textColor);
+            SaveASetting(L"bg_color", bgColor);
 
             DestroyWindow(hWnd);
             return 0;
