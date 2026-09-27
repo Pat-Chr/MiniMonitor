@@ -258,26 +258,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        //fetch the background color from the config file
-        char bg_Color[128] = {0};
-        GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
-        // Convert config text (ANSI) to a wide string for DrawTextW
-        WCHAR wBgColor[128] = {0};
-        MultiByteToWideChar(CP_ACP, 0, bg_Color, -1, wBgColor, _countof(wBgColor));
+        int r = 0, g = 0, b = 0; // declare here - they must be in the same scope
 
-		// parse config "R, G, B" and apply as COLORREF
-		int r = 0, g = 0, b = 0; // default black
-		int parsed = sscanf_s(bg_Color, "%d , %d , %d", &r, &g, &b);
-		if (parsed == 3) {
-			if (r < 0) r = 0; if (r > 255) r = 255;
-			if (g < 0) g = 0; if (g > 255) g = 255;
-			if (b < 0) b = 0; if (b > 255) b = 255;
-            SetBkColor(hdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
-		}
-		else {
-			// Fallback color in case of parsing failure
-            SetBkColor(hdc, ((COLORREF)(((BYTE)(0) | ((WORD)((BYTE)(0)) << 8)) | (((DWORD)(BYTE)(0)) << 16))));
-		}
+        // fetch the background color from the config file
+        char bg_Color[128] = { 0 };
+        std::wstring readBgColor;
+        ReadFromSettings(L"bg_color", readBgColor);
+
+        // Convert wstring to char array (ANSI)
+        int result = WideCharToMultiByte(CP_ACP, 0, readBgColor.c_str(), -1,
+            bg_Color, _countof(bg_Color), NULL, NULL);
+
+        if (result == 0) {
+            // Conversion failed, use default color
+            SetBkColor(hdc, RGB(0, 0, 0));
+        }
+        else {
+            // parse config "R, G, B" and apply as COLORREF
+
+            if (sscanf_s(bg_Color, "%d , %d , %d", &r, &g, &b) == 3) {
+                if (r < 0) r = 0; if (r > 255) r = 255;
+                if (g < 0) g = 0; if (g > 255) g = 255;
+                if (b < 0) b = 0; if (b > 255) b = 255;
+
+                SetBkColor(hdc, RGB(r, g, b));
+            }
+            else {
+                // Fallback color in case of parsing failure
+                SetBkColor(hdc, RGB(0, 0, 0));
+            }
+        }
 
 		// Draw Background.
         RECT rect;

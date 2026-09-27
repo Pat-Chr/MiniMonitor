@@ -56,6 +56,7 @@ RAM:XX%
 - v1.0.3.0 - WIP
 	- New function for global saving of settings. We don't have to create a new function everytime. (works)
 	- All the current settings use the new unified save function now.
+	- Code improvement. Universal read-config function instead of indivitual ones for every task. Is already being used by background color, but not text color yet.
 - v1.0.2.6 - 2026-09-21
 	- Change settings button added for easier access to settings. Opens a separate dialog window.
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.

@@ -9,12 +9,6 @@
 #include "resource.h" // Instead of "resource_ids.h"
 #include "readconfig.h"
 #include "editsettings.h"
-#include "saveasetting.h"
-
-// Global function to save a setting to the configuration file. Can be used for any setting.
-void SaveASetting(const std::wstring& key, const std::wstring& value);
-// Example usage: SaveASetting(L"settingName", L"settingValue");
-// Keep it in here. Is not used right now, but can be later on.
 
 #pragma comment(lib, "Version.lib")
 
@@ -128,31 +122,11 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
-		// Read and convert the configured text color to Unicode for display.
-		char colorBuffer[128] = { 0 };
-		GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
-
-		WCHAR wColor[128] = { 0 };
-		MultiByteToWideChar(
-			CP_ACP,
-			0,
-			colorBuffer,
-			-1,
-			wColor,
-			_countof(wColor));
-
-		// Read and convert the configured background color to Unicode for display.
-		char bg_Color[128] = { 0 };
-		GetBackgroundColorFromConfig(bg_Color, sizeof(bg_Color));
-
-		WCHAR wBgColor[128] = { 0 };
-		MultiByteToWideChar(
-			CP_ACP,
-			0,
-			bg_Color,
-			-1,
-			wBgColor,
-			_countof(wBgColor));
+		// Read the current settings for display
+		std::wstring wColor;
+		ReadFromSettings(L"text_color", wColor);
+		std::wstring wBgColor;
+		ReadFromSettings(L"bg_color", wBgColor);
 
 		// Build the help text and append the currently active settings.
 		std::wstring info =

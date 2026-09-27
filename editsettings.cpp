@@ -7,18 +7,15 @@
 #include <winver.h>
 #include <commdlg.h>
 #include <fstream>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 
 #pragma comment(lib, "Version.lib")
 #pragma comment(lib, "comdlg32.lib")
 
-#include "saveasetting.h";
-// Global function to save a setting to the configuration file. Can be used for any setting.
-void SaveASetting(const std::wstring& key, const std::wstring& value);
-// Example usage: SaveASetting(L"settingName", L"settingValue");
-
-//fetch the variables from the config file
-void GetTextColorFromConfig(char* buffer, size_t size);
-void GetBackgroundColorFromConfig(char* buffer, size_t size);
+#include "saveasetting.h"
+#include "readconfig.h"
 
 constexpr int ID_CHANGE_SETTINGS = 1001;
 constexpr int ID_SAVE = 1002;
@@ -163,7 +160,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
             COLORREF initialColor = RGB(0, 0, 0);
 
-            // Try to parse current text color
+            // Parse current text color
             char currentColor[256] = {};
             GetWindowTextA(GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT), currentColor, sizeof(currentColor));
             if (currentColor[0])
@@ -203,7 +200,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             };
             COLORREF initialColor = RGB(255, 255, 255);
 
-            // Try to parse current background color
+            // Parse current background color
             char currentColor[256] = {};
             GetWindowTextA(GetDlgItem(hWnd, ID_BG_COLOR_EDIT), currentColor, sizeof(currentColor));
             if (currentColor[0])
@@ -350,8 +347,16 @@ void OpenChangeSettingsWindow(HWND owner)
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_TEXT_COLOR_EDIT), textColorBuffer);
 
         // Load the configured background color and populate its edit control.
+        std::wstring wBgColor;
+        ReadFromSettings(L"bg_color", wBgColor);
         char bgColorBuffer[256] = {};
-        GetBackgroundColorFromConfig(bgColorBuffer, sizeof(bgColorBuffer));
+        int len = static_cast<int>(wBgColor.size());
+        if (len >= 255) {
+            len = 254;
+        }
+        int convertedLen = WideCharToMultiByte(CP_ACP, 0, wBgColor.c_str(), -1,
+            bgColorBuffer, 256, NULL, NULL);
+        bgColorBuffer[convertedLen] = '\0';
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_BG_COLOR_EDIT), bgColorBuffer);
     }
 }

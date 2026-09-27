@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <cstring>
+#include <string>
 
     // Ensure config.txt exists at startup; if not, create with default entries.
     void EnsureConfigFileExists()
@@ -16,7 +17,7 @@
         if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
             char* p = strrchr(mod, '\\');
             if (p) {
-                *++p = '\0'; // keep folder path including trailing '\'
+                *++p = '\0'; // keep folder path including trailing '\\'
                 strcpy_s(path, sizeof(path), mod);
                 strcat_s(path, sizeof(path), name);
             } else {
@@ -57,6 +58,7 @@
         CloseHandle(h);
     }
 
+
 //Get the text color from the config file
 void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
 {
@@ -67,7 +69,7 @@ void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
     if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
         char* p = strrchr(mod, '\\');
         if (p) {
-            *++p = '\0'; // keep folder path including trailing '\'
+            *++p = '\0'; // keep folder path including trailing '\\'
             strcpy_s(path, sizeof(path), mod);
             strcat_s(path, sizeof(path), name);
         }
@@ -111,38 +113,100 @@ void GetTextColorFromConfig(char* colorBuffer, size_t bufferSize)
     fclose(file);
 }
 
-// Get the background color from config.txt
-void GetBackgroundColorFromConfig(char* colorBuffer, size_t bufferSize)
+// We dont need that anymore. Do more tests to see if it can be safely removed.
+
+//// Get the background color from config.txt
+//void GetBackgroundColorFromConfig(char* colorBuffer, size_t bufferSize)
+//{
+//    const char* name = "config.txt";
+//    char path[MAX_PATH] = { 0 };
+//    // Determine path to the executable's folder
+//    char mod[MAX_PATH] = { 0 };
+//    if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
+//        char* p = strrchr(mod, '\\');
+//        if (p) {
+//            *++p = '\0'; // keep folder path including trailing '\\'
+//            strcpy_s(path, sizeof(path), mod);
+//            strcat_s(path, sizeof(path), name);
+//        }
+//        else {
+//            // No path separator found; use filename in current dir
+//            strcpy_s(path, sizeof(path), name);
+//        }
+//    }
+//    else {
+//        // Fallback: use current working directory
+//        GetCurrentDirectoryA(MAX_PATH, path);
+//        size_t len = strlen(path);
+//        if (len && path[len - 1] != '\\') strcat_s(path, sizeof(path), "\\");
+//        strcat_s(path, sizeof(path), name);
+//    }
+//    // Open the config file in binary mode to reliably detect BOM
+//    FILE* file = nullptr;
+//    if (fopen_s(&file, path, "rb") != 0 || !file) {
+//        OutputDebugStringA("GetbackgroundColorFromConfig: could not open config.txt\n");
+//        return;
+//    }
+//    char line[256];
+//    while (fgets(line, sizeof(line), file)) {
+//        char* pLine = line;
+//        // Skip UTF-8 BOM if present
+//        if ((unsigned char)pLine[0] == 0xEF && (unsigned char)pLine[1] == 0xBB && (unsigned char)pLine[2] == 0xBF) {
+//            pLine += 3;
+//        }
+//        // Look for "bg_color=" prefix and copy the value
+//        if (strncmp(pLine, "bg_color=", 9) == 0) {
+//            strncpy_s(colorBuffer, bufferSize, pLine + 9, _TRUNCATE);
+//            // Trim trailing CR/LF characters from the value
+//            size_t len = strlen(colorBuffer);
+//            while (len > 0 && (colorBuffer[len - 1] == '\n' || colorBuffer[len - 1] == '\r')) {
+//                colorBuffer[len - 1] = '\0';
+//                len--;
+//            }
+//            break;
+//        }
+//    }
+//    fclose(file);
+//}
+
+
+// Read from settings.
+// Searches for the name of the setting, then returns the value.
+// Input: "SettingName" Output: "SettingValue"
+// Use like this:
+// std::wstring wBgColor;
+// ReadFromSettings(L"bg_color", wBgColor)
+void ReadFromSettings(const std::wstring& SettingName, std::wstring& SettingValue)
 {
+    // Open config.txt for reading (use ANSI version since file is ASCII/UTF-8)
     const char* name = "config.txt";
     char path[MAX_PATH] = { 0 };
+    
     // Determine path to the executable's folder
     char mod[MAX_PATH] = { 0 };
     if (GetModuleFileNameA(NULL, mod, MAX_PATH) != 0) {
         char* p = strrchr(mod, '\\');
         if (p) {
-            *++p = '\0'; // keep folder path including trailing '\'
+            *++p = '\0'; // keep folder path including trailing '\\'
             strcpy_s(path, sizeof(path), mod);
             strcat_s(path, sizeof(path), name);
-        }
-        else {
-            // No path separator found; use filename in current dir
+        } else {
             strcpy_s(path, sizeof(path), name);
         }
-    }
-    else {
-        // Fallback: use current working directory
+    } else {
+        // Fallback: current working directory
         GetCurrentDirectoryA(MAX_PATH, path);
         size_t len = strlen(path);
         if (len && path[len - 1] != '\\') strcat_s(path, sizeof(path), "\\");
         strcat_s(path, sizeof(path), name);
     }
+    
     // Open the config file in binary mode to reliably detect BOM
     FILE* file = nullptr;
     if (fopen_s(&file, path, "rb") != 0 || !file) {
-        OutputDebugStringA("GetbackgroundColorFromConfig: could not open config.txt\n");
-        return;
+        return; // Config file not found or cannot be opened
     }
+    
     char line[256];
     while (fgets(line, sizeof(line), file)) {
         char* pLine = line;
@@ -150,17 +214,41 @@ void GetBackgroundColorFromConfig(char* colorBuffer, size_t bufferSize)
         if ((unsigned char)pLine[0] == 0xEF && (unsigned char)pLine[1] == 0xBB && (unsigned char)pLine[2] == 0xBF) {
             pLine += 3;
         }
-        // Look for "bg_color=" prefix and copy the value
-        if (strncmp(pLine, "bg_color=", 9) == 0) {
-            strncpy_s(colorBuffer, bufferSize, pLine + 9, _TRUNCATE);
-            // Trim trailing CR/LF characters from the value
-            size_t len = strlen(colorBuffer);
-            while (len > 0 && (colorBuffer[len - 1] == '\n' || colorBuffer[len - 1] == '\r')) {
-                colorBuffer[len - 1] = '\0';
-                len--;
+        
+        // Check if the line contains the setting name (case-insensitive comparison)
+        std::string sLine(pLine);
+        std::wstring wSettingName(SettingName);
+        
+        // Convert to wstring for comparison
+        std::wstring wLine;
+        for (size_t i = 0; i < sLine.length(); ++i) {
+            wLine.push_back((wchar_t)sLine[i]);
+        }
+        
+        if (wLine.find(wSettingName) != std::wstring::npos) {
+            // Extract the value after the '=' sign or space
+            char* delimiter = strchr(pLine, '=');
+            if (!delimiter) {
+                delimiter = strchr(pLine, ' ');
             }
-            break;
+            
+            if (delimiter) {
+                // Copy the value to a buffer
+                std::wstring value;
+                const char* valueStart = delimiter + 1;
+                
+                // Find end of value (newline or whitespace)
+                while (*valueStart && *valueStart != '\n' && *valueStart != '\r') {
+                    value.push_back((wchar_t)*valueStart);
+                    valueStart++;
+                }
+                
+                // Convert to wstring and set output parameter
+                SettingValue = value;
+                break;
+            }
         }
     }
+    
     fclose(file);
 }
