@@ -54,15 +54,15 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.3.0 - WIP
-	- New function for global saving of settings. We don't have to create a new function everytime. (works)
+	- New function for global saving of settings. We don't have to create a new function every time. (works)
 	- All the current settings use the new unified save function now.
-	- Code improvement. Universal read-config function instead of indivitual ones for every task. Is already being used by background color, but not text color yet.
+	- Code improvement. Universal read-config function instead of individual ones for every task. Is already being used by background color, but not text color yet.
 - v1.0.2.6 - 2026-09-21
 	- Change settings button added for easier access to settings. Opens a separate dialog window.
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.
 	- If the loaded window position is outside of the screen area. (example: resolution has changed) fall back to default position.
 	- If the window is being moved, ensure it stays fully within the monitor's work area.
-	- Bugfix: if video is being decoded while gpu compute is used at same time the value does not get added together anymore. instead it now picks the larger value of the two. 
+	- Bugfix: if video is being decoded while GPU compute is used at same time the value does not get added together anymore. instead it now picks the larger value of the two. 
 - v1.0.2.5 - 2026-09-20
 	- Now saves the last window position in the config file.
 	- The Config File now has a line for window position.
@@ -73,7 +73,7 @@ RAM:XX%
 	- moved creating the config file to readconfig.cpp so it doesn't clutter the main file.
 	- you can now change the text color in the config file. RGB Values.
 	- better icon
-	- settingswindow is now created in its own cpp file. much easier to read and work on.
+	- settings window is now created in its own file. much easier to read and work on.
 	- the settings window now shows the program version and the current text color.
 - v1.0.2.3 - 2026-09-18
 	- One pixel border for the main window. looks better now.
@@ -106,20 +106,26 @@ RAM:XX%
 ## Known Bugs and Issues.
 - Saving the changes does not affect the settings/info window until you reopen it.
 - The main loop reads the config file every tick. Which is just a sloppy solution. Can be done better.
-- Sometimes when playing a game you accidantly drag on the MiniMeter window instead and this causes the camera movement of the game to get ignored.
 
 ## 📜 License
-Copyright (c) 2026 Patrick CHriste]
+Copyright © 2026 Patrick Christe
 
 This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
 
+Summary of Rights:
 You are free to:
-- Share: Copy and redistribute the material in any medium or format.
-- Adapt: Remix, transform, and build upon the material.
+
+Share: Copy and redistribute the material in any medium or format.
+Adapt: Remix, transform, and build upon the material.
 
 Under the following terms:
-- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made.
-- NonCommercial: You may not use the material for commercial purposes.
+Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made. 
+You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+NonCommercial: You may not use the material for commercial purposes.
+
+Additional Notes:
+Not applicable when permitted under the Copyright and Related Rights Exceptions of a country where the work is located, 
+provided such exceptions are consistent with the tripartite convention on intellectual property.
 
 To view a copy of this license, visit:
-https://creativecommons.org
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
