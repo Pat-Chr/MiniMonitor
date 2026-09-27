@@ -17,14 +17,12 @@
  * 
  * @remarks
  * - Reads existing config.txt, updates or adds the specified setting line
- * - Supports any string value (including numeric values converted to strings)
- * - Writes updated content back to config.txt (truncating previous content)
+ * - Expects strings as input
+ * - Writes updated content to config.txt (truncating previous content)
  * - If setting doesn't exist, creates a new entry with the provided name and value. We may not need that in general, but it is a good fallback.
  * - -----
  * - Usage example inside the function: SaveASetting(L"settingName", L"settingValue");
- * - Include the header "saveasetting.h" to use this function in other parts of the application.
- * - don't forget the void SaveASetting(const std::wstring& key, const std::wstring& value);
- * - at the top of the file to declare the function for use in other files.
+ * - Include the header "saveasetting.h" to use this function in any part of the application.
  * - -----
  * @returns void
  */
