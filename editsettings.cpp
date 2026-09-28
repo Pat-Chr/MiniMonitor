@@ -125,7 +125,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         CreateWindowW(
             L"BUTTON",
             L"Save",
-            WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+            WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
             50, 100, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_SAVE),
@@ -136,14 +136,48 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         CreateWindowW(
             L"BUTTON",
             L"Cancel",
-            WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-            150, 100, 60, 25,
+            WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
+            180, 100, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_CANCEL),
             GetModuleHandleW(nullptr),
             nullptr);
 
         return 0;
+
+    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLOREDIT:
+    {
+        HDC hdc = reinterpret_cast<HDC>(wParam);
+        SetTextColor(hdc, RGB(255, 255, 255));
+        SetBkColor(hdc, RGB(0, 0, 0));
+        SetBkMode(hdc, message == WM_CTLCOLORSTATIC ? TRANSPARENT : OPAQUE);
+        return reinterpret_cast<INT_PTR>(GetStockObject(BLACK_BRUSH));
+    }
+
+    case WM_DRAWITEM:
+    {
+        auto* drawItem = reinterpret_cast<DRAWITEMSTRUCT*>(lParam);
+        if (drawItem->CtlType != ODT_BUTTON)
+            break;
+
+        FillRect(drawItem->hDC, &drawItem->rcItem, static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+        FrameRect(drawItem->hDC, &drawItem->rcItem, static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH)));
+
+        wchar_t buttonText[64] = {};
+        GetWindowTextW(drawItem->hwndItem, buttonText, static_cast<int>(sizeof(buttonText) / sizeof(buttonText[0])));
+        SetTextColor(drawItem->hDC, RGB(255, 255, 255));
+        SetBkMode(drawItem->hDC, TRANSPARENT);
+        DrawTextW(drawItem->hDC, buttonText, -1, &drawItem->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+        if (drawItem->itemState & ODS_FOCUS)
+        {
+            RECT focusRect = drawItem->rcItem;
+            InflateRect(&focusRect, -4, -4);
+            DrawFocusRect(drawItem->hDC, &focusRect);
+        }
+        return TRUE;
+    }
 
     case WM_COMMAND:
         switch (LOWORD(wParam))
@@ -288,7 +322,7 @@ void OpenChangeSettingsWindow(HWND owner)
         windowClass.lpfnWndProc = ChangeSettingsWndProc;
         windowClass.lpszClassName = L"MiniMonitorChangeSettingsWindow";
         windowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-        windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+        windowClass.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 
         RegisterClassW(&windowClass);
         classRegistered = true;
@@ -303,8 +337,8 @@ void OpenChangeSettingsWindow(HWND owner)
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     // Define the desired dimensions of the settings window.
-    const int windowWidth = 300;
-    const int windowHeight = 200;
+    const int windowWidth = 310;
+    const int windowHeight = 210;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;
