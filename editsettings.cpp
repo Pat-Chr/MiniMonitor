@@ -342,8 +342,16 @@ void OpenChangeSettingsWindow(HWND owner)
         UpdateWindow(g_changeSettingsWindow);
 
         // Load the configured text color and populate its edit control.
+        std::wstring wTextColor;
+        ReadFromSettings(L"text_color", wTextColor);
         char textColorBuffer[256] = {};
-        GetTextColorFromConfig(textColorBuffer, sizeof(textColorBuffer));
+        int lentext = static_cast<int>(wTextColor.size());
+        if (lentext >= 255) {
+            lentext = 254;
+        }
+        int convertedLentext = WideCharToMultiByte(CP_ACP, 0, wTextColor.c_str(), -1,
+            textColorBuffer, 256, NULL, NULL);
+        textColorBuffer[convertedLentext] = '\0';
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_TEXT_COLOR_EDIT), textColorBuffer);
 
         // Load the configured background color and populate its edit control.

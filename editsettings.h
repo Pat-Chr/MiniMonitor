@@ -1,4 +1,4 @@
-﻿// editsettings.h
+﻿// editsettings.h contains the declaration of the class EditSettings
 #ifndef EDITSETTINGS_H
 #define EDITSETTINGS_H
 
@@ -7,10 +7,6 @@
 #include <vector>
 
 #pragma comment(lib, "Version.lib")
-
-//fetch the variables from the config file
-void GetTextColorFromConfig(char* buffer, size_t size);
-void GetBackgroundColorFromConfig(char* buffer, size_t size);
 
 static std::wstring GetProgramVersion();
 

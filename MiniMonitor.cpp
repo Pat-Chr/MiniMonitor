@@ -324,18 +324,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int count = static_cast<int>(lines.size());
         int swprintfCount = count; // number of swprintf_s calls that produced lines here
 
-        // Determine per-line rects and draw each centered in its slice
+        // get the text color from the config file
         if (count > 0)
         {
-			// SetTextColor from config
-            char colorBuffer[128] = { 0 };
-            GetTextColorFromConfig(colorBuffer, sizeof(colorBuffer));
-            WCHAR wColor[128] = { 0 };
-            MultiByteToWideChar(CP_ACP, 0, colorBuffer, -1, wColor, _countof(wColor));
+            std::wstring wTextColor;
+            ReadFromSettings(L"text_color", wTextColor);
+            char textColorBuffer[256] = {};
+            int lentext = static_cast<int>(wTextColor.size());
+            if (lentext >= 255) {
+                lentext = 254;
+            }
+            int convertedLentext = WideCharToMultiByte(CP_ACP, 0, wTextColor.c_str(), -1,
+                textColorBuffer, 256, NULL, NULL);
+            textColorBuffer[convertedLentext] = '\0';
 
             // Parse config "R, G, B" and apply as COLORREF
             int r = 200, g = 200, b = 200; // default
-            int parsed = sscanf_s(colorBuffer, "%d , %d , %d", &r, &g, &b);
+            int parsed = sscanf_s(textColorBuffer, "%d , %d , %d", &r, &g, &b);
             if (parsed == 3) {
                 if (r < 0) r = 0; if (r > 255) r = 255;
                 if (g < 0) g = 0; if (g > 255) g = 255;
