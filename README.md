@@ -53,11 +53,14 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.3.0 - WIP
+- v1.0.3.0 - 2026-09-28
 	- New function for global saving of settings. We don't have to create a new function every time. (works)
 	- All the current settings use the new unified save function now.
-	- Code improvement. Universal read-config function instead of individual ones for every task. Is already being used by background color, but not text color yet.
+	- Code improvement. Universal read-config function instead of individual ones for every task.
 	- Code improvement. Reading the text color is now all done in the ReadFromSettings function. Not needing the GetTextColor function anymore.
+	- reading background also now handled in the ReadFromSettings function. Not needing the GetBackgroundColor function anymore.
+	- New reset Button to reset the settings to default.
+	- Color of the edit settings window is now same as info window.
 - v1.0.2.6 - 2026-09-21
 	- Change settings button added for easier access to settings. Opens a separate dialog window.
 	- Dragging now requires SHIFT key to be held down to prevent accidental moves.
