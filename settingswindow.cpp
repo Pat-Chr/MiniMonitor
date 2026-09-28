@@ -80,32 +80,6 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			nullptr);
 		return 0;
 
-	//case WM_SIZE:
-	//{
-	//	// Keep the button aligned with the top-right corner when the window is resized.
-	//	HWND button = GetDlgItem(hWnd, ID_CHANGE_SETTINGS);
-
-	//	if (button != nullptr)
-	//	{
-	//		RECT rect;
-	//		GetClientRect(hWnd, &rect);
-
-	//		const int buttonWidth = 130;
-	//		const int buttonHeight = 25;
-	//		const int margin = 10;
-
-	//		MoveWindow(
-	//			button,
-	//			rect.right - buttonWidth - margin,
-	//			margin,
-	//			buttonWidth,
-	//			buttonHeight,
-	//			TRUE);
-	//	}
-
-	//	return 0;
-	//}
-
 	case WM_COMMAND:
 		// Handle both Edit Settings and Reset Settings buttons.
 		if (HIWORD(wParam) == BN_CLICKED)
@@ -118,15 +92,23 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				break;
 
 			case ID_CHANGE_SETTINGS_RESET:
-				// Reset settings when the reset button is clicked.
-				// Delete existing config file if it exists.
-				DeleteFileW(L"config.txt");
+				// Show confirmation dialog before resetting settings.
+				if (MessageBoxW(
+					hWnd,
+					L"Are you sure you want to reset all settings? This will delete your current configuration and create a new one with default values.",
+					L"Reset Settings",
+					MB_YESNO | MB_ICONWARNING) == IDYES)
+				{
+					// Reset settings when the user confirms.
+					// Delete existing config file if it exists.
+					DeleteFileW(L"config.txt");
 
-				// Create a new config file with default values.
-				EnsureConfigFileExists();
+					// Create a new config file with default values.
+					EnsureConfigFileExists();
 
-				// Refresh the display to show the new settings.
-				InvalidateRect(hWnd, nullptr, TRUE);
+					// Refresh the display to show the new settings.
+					InvalidateRect(hWnd, nullptr, TRUE);
+				}
 				break;
 			}
 		}
