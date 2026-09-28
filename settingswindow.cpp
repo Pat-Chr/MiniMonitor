@@ -62,48 +62,75 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Edit Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			10, 10, 130, 25,
+			180, 10, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
 			GetModuleHandleW(nullptr),
 			nullptr);
+
+		// Create the button used to reset settings (delete config and create new).
+		CreateWindowW(
+			L"BUTTON",
+			L"Reset Settings",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			180, 45, 120, 25,
+			hWnd,
+			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_RESET),
+			GetModuleHandleW(nullptr),
+			nullptr);
 		return 0;
 
-	case WM_SIZE:
-	{
-		// Keep the button aligned with the top-right corner when the window is resized.
-		HWND button = GetDlgItem(hWnd, ID_CHANGE_SETTINGS);
+	//case WM_SIZE:
+	//{
+	//	// Keep the button aligned with the top-right corner when the window is resized.
+	//	HWND button = GetDlgItem(hWnd, ID_CHANGE_SETTINGS);
 
-		if (button != nullptr)
-		{
-			RECT rect;
-			GetClientRect(hWnd, &rect);
+	//	if (button != nullptr)
+	//	{
+	//		RECT rect;
+	//		GetClientRect(hWnd, &rect);
 
-			const int buttonWidth = 130;
-			const int buttonHeight = 25;
-			const int margin = 10;
+	//		const int buttonWidth = 130;
+	//		const int buttonHeight = 25;
+	//		const int margin = 10;
 
-			MoveWindow(
-				button,
-				rect.right - buttonWidth - margin,
-				margin,
-				buttonWidth,
-				buttonHeight,
-				TRUE);
-		}
+	//		MoveWindow(
+	//			button,
+	//			rect.right - buttonWidth - margin,
+	//			margin,
+	//			buttonWidth,
+	//			buttonHeight,
+	//			TRUE);
+	//	}
 
-		return 0;
-	}
+	//	return 0;
+	//}
 
 	case WM_COMMAND:
-		// Open the settings editor when the button is clicked.
-		if (LOWORD(wParam) == ID_CHANGE_SETTINGS &&
-			HIWORD(wParam) == BN_CLICKED)
+		// Handle both Edit Settings and Reset Settings buttons.
+		if (HIWORD(wParam) == BN_CLICKED)
 		{
-			OpenChangeSettingsWindow(hWnd);
-			return 0;
+			switch (LOWORD(wParam))
+			{
+			case ID_CHANGE_SETTINGS:
+				// Open the settings editor when the button is clicked.
+				OpenChangeSettingsWindow(hWnd);
+				break;
+
+			case ID_CHANGE_SETTINGS_RESET:
+				// Reset settings when the reset button is clicked.
+				// Delete existing config file if it exists.
+				DeleteFileW(L"config.txt");
+
+				// Create a new config file with default values.
+				EnsureConfigFileExists();
+
+				// Refresh the display to show the new settings.
+				InvalidateRect(hWnd, nullptr, TRUE);
+				break;
+			}
 		}
-		break;
+		return DefWindowProc(hWnd, message, wParam, lParam);
 
 	case WM_PAINT:
 	{
@@ -130,7 +157,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		// Build the help text and append the currently active settings.
 		std::wstring info =
-			L"\n\n\nControls:\n"
+			L"\n\n\n\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
