@@ -54,6 +54,7 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.3.0 - 2026-09-28
+	- Border can now be switched on/off in settings window. (needs a restart)
 	- New function for global saving of settings. We don't have to create a new function every time. (works)
 	- All the current settings use the new unified save function now.
 	- Code improvement. Universal read-config function instead of individual ones for every task.
