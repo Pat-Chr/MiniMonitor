@@ -280,15 +280,8 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         {
             // Checkbox state change - update the display text
             int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show Border";
-            if (checkState == BST_CHECKED)
-            {
-                SetWindowTextW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), labelText);
-            }
-            else
-            {
-                SetWindowTextW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), L"Hide Border");
-            }
+            wchar_t labelText[128] = L"Show Border - (needs restart)";
+
             return 0;
         }
 
@@ -442,7 +435,7 @@ void OpenChangeSettingsWindow(HWND owner)
         SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
 
         // Update checkbox label based on current state.
-        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Hide Border";
+        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border - (needs restart)" : L"Show Border - (needs restart)";
         SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
     }
 }

@@ -316,12 +316,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
         lines.emplace_back(tmp);
 
-		//Testing new option. Lines can also be hidden by usind a bool in the config file.
-		bool showTestLine = false; // This would be read from the config file in a real scenario
+		//Option for the future. Lines can also be hidden by using a bool in the config file.
+
+		/*bool showTestLine = false; // This would be read from the config file in a real scenario
         if (showTestLine) {
             swprintf_s(tmp, _countof(tmp), L"Testline");
             lines.emplace_back(tmp);
-        }
+        }*/
 
         // Example of adding another line (commented out) — uncomment or add more as needed
         // swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
