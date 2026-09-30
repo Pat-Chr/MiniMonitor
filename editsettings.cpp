@@ -1,4 +1,5 @@
-﻿// file: editsettings.cpp
+﻿// file: E:\Visual Studio Projects\repos\MiniMonitor\editsettings.cpp
+// file: editsettings.cpp
 // Edit settings window procedure for showing controls / settings
 
 #include <windows.h>
@@ -24,6 +25,7 @@ constexpr int ID_TEXT_COLOR_EDIT = 1004;
 constexpr int ID_BG_COLOR_EDIT = 1005;
 constexpr int ID_TEXT_COLOR_PICKER = 1006;
 constexpr int ID_BG_COLOR_PICKER = 1007;
+constexpr int ID_SHOW_BORDER_CHECKBOX = 1008;
 
 HWND g_changeSettingsWindow = nullptr;
 
@@ -121,12 +123,23 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             GetModuleHandleW(nullptr),
             nullptr);
 
+        // Create Show Border checkbox
+        CreateWindowW(
+            L"BUTTON",
+            L"",
+            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+            10, 85, 290, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_SHOW_BORDER_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
         // Create Save button
         CreateWindowW(
             L"BUTTON",
             L"Save",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            50, 100, 60, 25,
+            50, 120, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_SAVE),
             GetModuleHandleW(nullptr),
@@ -137,7 +150,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Cancel",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            180, 100, 60, 25,
+            180, 120, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_CANCEL),
             GetModuleHandleW(nullptr),
@@ -263,6 +276,22 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             return 0;
         }
 
+        case ID_SHOW_BORDER_CHECKBOX:
+        {
+            // Checkbox state change - update the display text
+            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+            wchar_t labelText[128] = L"Show Border";
+            if (checkState == BST_CHECKED)
+            {
+                SetWindowTextW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), labelText);
+            }
+            else
+            {
+                SetWindowTextW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), L"Hide Border");
+            }
+            return 0;
+        }
+
         // Save button reads the chosen values and saves them using SaveASetting()
         case ID_SAVE:
         {
@@ -280,6 +309,11 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
             SaveASetting(L"text_color", textColor);
             SaveASetting(L"bg_color", bgColor);
+
+            // Save ShowBorder setting
+            int showBorderState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), BM_GETCHECK, 0, 0);
+            std::wstring showBorderValue = (showBorderState == BST_CHECKED) ? L"true" : L"false";
+            SaveASetting(L"ShowBorder", showBorderValue);
 
             DestroyWindow(hWnd);
             return 0;
@@ -338,7 +372,7 @@ void OpenChangeSettingsWindow(HWND owner)
 
     // Define the desired dimensions of the settings window.
     const int windowWidth = 310;
-    const int windowHeight = 210;
+    const int windowHeight = 240;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;
@@ -400,5 +434,15 @@ void OpenChangeSettingsWindow(HWND owner)
             bgColorBuffer, 256, NULL, NULL);
         bgColorBuffer[convertedLen] = '\0';
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_BG_COLOR_EDIT), bgColorBuffer);
+
+        // Load the configured ShowBorder setting and populate the checkbox.
+        std::wstring wShowBorder;
+        ReadFromSettings(L"ShowBorder", wShowBorder);
+        int showBorderState = (wShowBorder == L"true") ? BST_CHECKED : BST_UNCHECKED;
+        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
+
+        // Update checkbox label based on current state.
+        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Hide Border";
+        SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
     }
 }

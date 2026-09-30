@@ -219,13 +219,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     const POINT windowPosition = ReadWindowPosition();
 
+
+    // Config option. Show border or no border. Default is true.
+    std::wstring ShowBorder = L"true";
+    ReadFromSettings(L"ShowBorder", ShowBorder);
+    // Convert wstring to bool (handles "true"/"false", "1"/"0", etc.)
+    bool showBorder = (_wcsicmp(ShowBorder.c_str(), L"true") == 0);
+
     // WS_POPUP: no border/title
     // WS_EX_TOOLWINDOW: hide from taskbar
     // WS_EX_TOPMOST: keep the monitor window above other windows
     HWND hWnd = CreateWindowExW(
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
         szWindowClass, L"",
-        WS_POPUP | WS_BORDER,
+        WS_POPUP | (showBorder ? WS_BORDER : 0),
         windowPosition.x, windowPosition.y, 80, 10,
         nullptr, nullptr, hInstance, nullptr);
 
