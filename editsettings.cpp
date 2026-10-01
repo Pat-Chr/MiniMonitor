@@ -441,7 +441,7 @@ void OpenChangeSettingsWindow(HWND owner)
         SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
 
         // Update checkbox label based on current state.
-        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border)" : L"Show Border)";
+        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Show Border";
         SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
     }
 }
