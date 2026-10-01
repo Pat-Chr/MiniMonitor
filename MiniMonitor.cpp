@@ -19,6 +19,7 @@
 
 // Global instances and window text
 HINSTANCE hInst;
+HWND g_mainWindow = nullptr;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 
@@ -40,6 +41,37 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK    InfoWndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
+
+void RefreshWindowBorder()
+{
+    if (!g_mainWindow) return;
+
+    // 1. SRead ShowBorder setting from config file
+    std::wstring ShowBorder = L"true";
+    ReadFromSettings(L"ShowBorder", ShowBorder);
+    bool showBorder = (_wcsicmp(ShowBorder.c_str(), L"true") == 0);
+
+    // 2. Update window Styles
+    if (showBorder) {
+        SetWindowLongPtr(g_mainWindow, GWL_STYLE, GetWindowLongPtr(g_mainWindow, GWL_STYLE) | WS_BORDER);
+    }
+    else {
+        SetWindowLongPtr(g_mainWindow, GWL_STYLE, GetWindowLongPtr(g_mainWindow, GWL_STYLE) & ~WS_BORDER);
+    }
+
+    SetWindowPos(
+        g_mainWindow,
+        nullptr,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+
+    // 3. Paint window new
+    InvalidateRect(g_mainWindow, NULL, TRUE);
+    UpdateWindow(g_mainWindow);
+}
 
 // Hide toolbar, rebar and statusbar child windows in the window
 static BOOL CALLBACK HideTopChildren(HWND child, LPARAM)
@@ -238,6 +270,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     if (!hWnd)
         return FALSE;
+
+    g_mainWindow = hWnd;
 
     // Remove top bar elements (menu, toolbars, status bar)
     DisableTopBar(hWnd);

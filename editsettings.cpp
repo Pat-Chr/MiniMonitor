@@ -54,10 +54,13 @@ COLORREF HexStringToColor(const char* hex)
     return RGB(0, 0, 0);
 }
 
+void RefreshWindowBorder();
+
 LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
-    {
+    {                
+
     case WM_CREATE:
         // Create Text Color label and edit control
         CreateWindowW(
@@ -280,7 +283,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         {
             // Checkbox state change - update the display text
             int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show Border - (needs restart)";
+            wchar_t labelText[128] = L"Show Border";
 
             return 0;
         }
@@ -308,6 +311,9 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             std::wstring showBorderValue = (showBorderState == BST_CHECKED) ? L"true" : L"false";
             SaveASetting(L"ShowBorder", showBorderValue);
 
+            // Refresh the main window, then close settings window
+
+            RefreshWindowBorder();
             DestroyWindow(hWnd);
             return 0;
         }
@@ -435,7 +441,7 @@ void OpenChangeSettingsWindow(HWND owner)
         SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
 
         // Update checkbox label based on current state.
-        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border - (needs restart)" : L"Show Border - (needs restart)";
+        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border)" : L"Show Border)";
         SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
     }
 }
