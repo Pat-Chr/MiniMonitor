@@ -278,7 +278,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // Remove top bar elements (menu, toolbars, status bar)
     DisableTopBar(hWnd);
 
-    // Set timer for 500ms
+    // Set timer for 200ms
+    // Planned feature. timer options. e.g., 100ms, 200ms, 500ms, etc.
+    // testing needed to ensure the timer is not too frequent or too slow.
     SetTimer(hWnd, 1, 200, NULL);
 
     ShowWindow(hWnd, nCmdShow);
@@ -347,9 +349,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Adding lines one by one, using swprintf_s to format the text
         swprintf_s(tmp, _countof(tmp), L"CPU:%3.0f%%", cpuLoad);
         lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
-        lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"GPU:%3.0f%%", gpuLoad);
+        lines.emplace_back(tmp);
+        swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
         lines.emplace_back(tmp);
         swprintf_s(tmp, _countof(tmp), L"VRAM:%3.0f%%", gpuRamLoad);
         lines.emplace_back(tmp);
