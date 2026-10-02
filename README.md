@@ -56,6 +56,7 @@ RAM:XX%
 - v1.0.4.0 - Work in progress
 	- Switching the Border on and off no longer needs a restart.
 	- Added new VideoRam usage Information.
+	- Added double Buffering to the Main window. Stops flickering.
 - v1.0.3.0 - 2026-09-28
 	- Border can now be switched on/off in settings window. (needs a restart)
 	- New function for global saving of settings. We don't have to create a new function every time. (works)

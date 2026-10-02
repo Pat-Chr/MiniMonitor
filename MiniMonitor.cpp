@@ -17,6 +17,7 @@
 #pragma comment(lib, "pdh.lib")
 
 #define MAX_LOADSTRING 100
+constexpr UINT WM_RESIZE_MONITOR = WM_APP + 1;
 
 // Global instances and window text
 HINSTANCE hInst;
@@ -298,10 +299,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         InvalidateRect(hWnd, NULL, FALSE); // Trigger a repaint
         break;
 
+    case WM_RESIZE_MONITOR:
+    {
+        RECT wndRect;
+        if (GetWindowRect(hWnd, &wndRect)) {
+            const int currentHeight = wndRect.bottom - wndRect.top;
+            const int currentWidth = wndRect.right - wndRect.left;
+            const int desiredHeight = static_cast<int>(wParam);
+            if (abs(currentHeight - desiredHeight) > 1) {
+                SetWindowPos(hWnd, NULL, 0, 0, currentWidth, desiredHeight,
+                    SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+            }
+        }
+    }
+    break;
+
+    case WM_ERASEBKGND:
+        return 1;
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
+        RECT rect;
+        GetClientRect(hWnd, &rect);
+
+        HDC drawingHdc = hdc;
+        HDC memoryDc = CreateCompatibleDC(hdc);
+        HBITMAP memoryBitmap = nullptr;
+        HGDIOBJ previousBitmap = nullptr;
+        bool useDoubleBuffer = false;
+
+        const int clientWidth = rect.right - rect.left;
+        const int clientHeight = rect.bottom - rect.top;
+        if (memoryDc && clientWidth > 0 && clientHeight > 0) {
+            memoryBitmap = CreateCompatibleBitmap(hdc, clientWidth, clientHeight);
+            if (memoryBitmap) {
+                previousBitmap = SelectObject(memoryDc, memoryBitmap);
+                if (previousBitmap && previousBitmap != HGDI_ERROR) {
+                    drawingHdc = memoryDc;
+                    useDoubleBuffer = true;
+                }
+            }
+        }
 
         int r = 0, g = 0, b = 0; // declare here - they must be in the same scope
 
@@ -316,7 +356,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         if (result == 0) {
             // Conversion failed, use default color
-            SetBkColor(hdc, RGB(0, 0, 0));
+            SetBkColor(drawingHdc, RGB(0, 0, 0));
         }
         else {
             // parse config "R, G, B" and apply as COLORREF
@@ -326,19 +366,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (g < 0) g = 0; if (g > 255) g = 255;
                 if (b < 0) b = 0; if (b > 255) b = 255;
 
-                SetBkColor(hdc, RGB(r, g, b));
+                SetBkColor(drawingHdc, RGB(r, g, b));
             }
             else {
                 // Fallback color in case of parsing failure
-                SetBkColor(hdc, RGB(0, 0, 0));
+                SetBkColor(drawingHdc, RGB(0, 0, 0));
             }
         }
 
 		// Draw Background.
-        RECT rect;
-        GetClientRect(hWnd, &rect);
         HBRUSH hBgBrush = CreateSolidBrush(((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
-        FillRect(hdc, &rect, hBgBrush);
+        FillRect(drawingHdc, &rect, hBgBrush);
         DeleteObject(hBgBrush);
 
         // Prepare Text (stacked: flexible number of lines)
@@ -393,16 +431,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (r < 0) r = 0; if (r > 255) r = 255;
                 if (g < 0) g = 0; if (g > 255) g = 255;
                 if (b < 0) b = 0; if (b > 255) b = 255;
-                SetTextColor(hdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
+                SetTextColor(drawingHdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
             } else {
                 // Fallback color in case of parsing failure
-                SetTextColor(hdc, ((COLORREF)(((BYTE)(200) | ((WORD)((BYTE)(200)) << 8)) | (((DWORD)(BYTE)(200)) << 16))));
+                SetTextColor(drawingHdc, ((COLORREF)(((BYTE)(200) | ((WORD)((BYTE)(200)) << 8)) | (((DWORD)(BYTE)(200)) << 16))));
             }
-            SetBkMode(hdc, TRANSPARENT);
+            SetBkMode(drawingHdc, TRANSPARENT);
 
             // Measure one line height using current font
             TEXTMETRIC tm;
-            GetTextMetrics(hdc, &tm);
+            GetTextMetrics(drawingHdc, &tm);
             int lineHeight = tm.tmHeight;
             int padding = 8; // top+bottom padding
 
@@ -416,15 +454,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int nonClientHeight = windowHeight - clientHeight;
             int desiredWindowHeight = desiredClientHeight + nonClientHeight;
 
-            int currentWindowWidth = wndRect.right - wndRect.left;
             // Only resize if height differs (avoid flicker/continuous repaints)
             if (abs(windowHeight - desiredWindowHeight) > 1)
             {
-                // Keep position, change size only
-                SetWindowPos(hWnd, NULL, 0, 0, currentWindowWidth, desiredWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
-                // Update client rect after resize
-                GetClientRect(hWnd, &rect);
-                clientHeight = rect.bottom - rect.top;
+                PostMessage(hWnd, WM_RESIZE_MONITOR,
+                    static_cast<WPARAM>(desiredWindowHeight), 0);
             }
 
             int height = rect.bottom - rect.top;
@@ -433,11 +467,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 RECT part = rect;
                 part.top = rect.top + (height * i) / count;
                 part.bottom = rect.top + (height * (i + 1)) / count;
-                DrawTextW(hdc, lines[i].c_str(), -1, &part, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+                DrawTextW(drawingHdc, lines[i].c_str(), -1, &part, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
         }
 
+        if (useDoubleBuffer) {
+            BitBlt(hdc, 0, 0, clientWidth, clientHeight, memoryDc, 0, 0, SRCCOPY);
+        }
+
         EndPaint(hWnd, &ps);
+        if (previousBitmap && previousBitmap != HGDI_ERROR) {
+            SelectObject(memoryDc, previousBitmap);
+        }
+        if (memoryBitmap) {
+            DeleteObject(memoryBitmap);
+        }
+        if (memoryDc) {
+            DeleteDC(memoryDc);
+        }
     }
     break;
 
