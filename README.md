@@ -54,7 +54,8 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.4.0 - Work in progress
-	- Switching the Border on and off no longer needs a restart.	 
+	- Switching the Border on and off no longer needs a restart.
+	- Added new VideoRam usage Information.
 - v1.0.3.0 - 2026-09-28
 	- Border can now be switched on/off in settings window. (needs a restart)
 	- New function for global saving of settings. We don't have to create a new function every time. (works)

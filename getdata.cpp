@@ -7,8 +7,11 @@
 #include <pdhmsg.h>
 #include <vector>
 #include <algorithm>
+#include <dxgi1_4.h>
+#include <cstdint>
 
 #pragma comment(lib, "pdh.lib")
+#pragma comment(lib, "dxgi.lib")
 
 // Externs defined in MiniMonitor.cpp
 extern PDH_HQUERY cpuQuery;
@@ -19,9 +22,26 @@ extern float cpuLoad;
 extern float gpuLoad;
 extern float ramLoad;
 extern bool firstSampleTaken;
+extern float gpuRamLoad;
 
 void UpdatePerformanceData()
 {
+    static PDH_HQUERY gpuMemoryQuery = nullptr;
+    static PDH_HCOUNTER gpuMemoryCounter = nullptr;
+    static bool gpuMemoryCounterInitialized = false;
+
+    if (!gpuMemoryCounterInitialized) {
+        gpuMemoryCounterInitialized = true;
+        if (PdhOpenQueryW(nullptr, 0, &gpuMemoryQuery) != ERROR_SUCCESS ||
+            PdhAddEnglishCounterW(gpuMemoryQuery, L"\\GPU Adapter Memory(*)\\Dedicated Usage", 0, &gpuMemoryCounter) != ERROR_SUCCESS) {
+            if (gpuMemoryQuery) {
+                PdhCloseQuery(gpuMemoryQuery);
+                gpuMemoryQuery = nullptr;
+            }
+            gpuMemoryCounter = nullptr;
+        }
+    }
+
     // CPU: collect and format the aggregated processor utility value.
     if (cpuQuery && cpuCounter) {
         PDH_STATUS status = PdhCollectQueryData(cpuQuery);
@@ -84,6 +104,58 @@ void UpdatePerformanceData()
         double pct = (used / static_cast<double>(mem.ullTotalPhys)) * 100.0;
         pct = std::clamp(pct, 0.0, 100.0);
         ramLoad = static_cast<float>(pct);
+    }
+
+    if (gpuMemoryQuery && gpuMemoryCounter && PdhCollectQueryData(gpuMemoryQuery) == ERROR_SUCCESS) {
+        DWORD bufferSize = 0;
+        DWORD itemCount = 0;
+        PDH_STATUS status = PdhGetFormattedCounterArrayW(
+            gpuMemoryCounter, PDH_FMT_LARGE, &bufferSize, &itemCount, nullptr);
+
+        if (status == PDH_MORE_DATA && bufferSize > 0 && itemCount > 0) {
+            std::vector<BYTE> buffer(bufferSize);
+            auto* items = reinterpret_cast<PDH_FMT_COUNTERVALUE_ITEM_W*>(buffer.data());
+            status = PdhGetFormattedCounterArrayW(
+                gpuMemoryCounter, PDH_FMT_LARGE, &bufferSize, &itemCount, items);
+
+            if (status == ERROR_SUCCESS) {
+                uint64_t totalUsage = 0;
+                for (DWORD i = 0; i < itemCount; ++i) {
+                    if (items[i].FmtValue.CStatus == ERROR_SUCCESS && items[i].FmtValue.largeValue > 0) {
+                        totalUsage += static_cast<uint64_t>(items[i].FmtValue.largeValue);
+                    }
+                }
+
+                uint64_t totalDedicatedMemory = 0;
+                IDXGIFactory4* factory = nullptr;
+                if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))) {
+                    for (UINT index = 0;; ++index) {
+                        IDXGIAdapter1* adapter = nullptr;
+                        if (factory->EnumAdapters1(index, &adapter) == DXGI_ERROR_NOT_FOUND) {
+                            break;
+                        }
+                        if (!adapter) {
+                            continue;
+                        }
+
+                        DXGI_ADAPTER_DESC1 description{};
+                        if (SUCCEEDED(adapter->GetDesc1(&description)) &&
+                            !(description.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)) {
+                            totalDedicatedMemory += description.DedicatedVideoMemory;
+                        }
+
+                        adapter->Release();
+                    }
+                    factory->Release();
+                }
+
+                if (totalDedicatedMemory > 0) {
+                    const double percentage =
+                        (static_cast<double>(totalUsage) / static_cast<double>(totalDedicatedMemory)) * 100.0;
+                    gpuRamLoad = static_cast<float>(std::clamp(percentage, 0.0, 100.0));
+                }
+            }
+        }
     }
 
     // Indicate that at least one sample has been captured.

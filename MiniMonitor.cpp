@@ -7,6 +7,7 @@
 #include <cmath>
 #include <windows.h>
 #include <cstring>
+#include <cstdint>        // <-- neu
 #include "readconfig.h"
 #include "SaveWindowPos.h"
 #include "settingswindow.h"
@@ -33,6 +34,7 @@ PDH_HCOUNTER gpuCounter;
 float cpuLoad = 0.0f;
 float gpuLoad = 0.0f;
 float ramLoad = 0.0f;
+float gpuRamLoad = 0.0f;
 bool firstSampleTaken = false;
 
 // Forward declarations of update function
@@ -265,7 +267,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
         szWindowClass, L"",
         WS_POPUP | (showBorder ? WS_BORDER : 0),
-        windowPosition.x, windowPosition.y, 80, 10,
+        windowPosition.x, windowPosition.y, 85, 10,
         nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
@@ -277,7 +279,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     DisableTopBar(hWnd);
 
     // Set timer for 500ms
-    SetTimer(hWnd, 1, 500, NULL);
+    SetTimer(hWnd, 1, 200, NULL);
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
@@ -343,11 +345,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         wchar_t tmp[128];
 
 		// Adding lines one by one, using swprintf_s to format the text
-        swprintf_s(tmp, _countof(tmp), L"CPU:%0.0f%%", cpuLoad);
+        swprintf_s(tmp, _countof(tmp), L"CPU:%3.0f%%", cpuLoad);
         lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"GPU:%0.0f%%", gpuLoad);
+        swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
         lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
+        swprintf_s(tmp, _countof(tmp), L"GPU:%3.0f%%", gpuLoad);
+        lines.emplace_back(tmp);
+        swprintf_s(tmp, _countof(tmp), L"VRAM:%3.0f%%", gpuRamLoad);
         lines.emplace_back(tmp);
 
 		//Option for the future. Lines can also be hidden by using a bool in the config file.
