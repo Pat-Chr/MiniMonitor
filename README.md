@@ -53,7 +53,7 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.4.0 - Work in progress
+- v1.0.4.0 - 2026-10-02
 	- Switching the Border on and off no longer needs a restart.
 	- Added new VideoRam usage Information.
 	- Added double Buffering to the Main window. Stops flickering.
