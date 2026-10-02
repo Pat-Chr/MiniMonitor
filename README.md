@@ -3,7 +3,7 @@
 
 Minimalist Windows desktop widget for real-time CPU and GPU utilization monitoring.
 
-![preview](docs/images/preview_1.0.2.3.png)
+![preview](docs/images/preview_1.0.4.0.png)
 
 ## General Info on this project:
 This was created by an engineer who works on CAD all day and never made a full program by himself.
