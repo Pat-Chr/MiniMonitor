@@ -107,7 +107,7 @@ RAM:XX%
 ## 🗒️ Planned features and improvements.
 - Adding a tooltip that says "Right click for settings" when the user hovers the mouse over the main window. Note: haven't figured out how yet.
 - I will make a really really cool logo in SolidWorks someday :)
-- Add an option to change the border of the main window to invisible or a different color.
+- Add an option to change the border of the main window to a different color.
 - Add a transparency option. (This is a bit harder because it also causes the text to be transparent as well)
 - Option checkboxes to turn on and off some of the meters. example "show memory" [x]
 - Idea for faster refresh and a speed option, but i have to test how the code behaves if i go too far. The goal would be 30Hz.
