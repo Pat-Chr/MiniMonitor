@@ -170,11 +170,15 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		info += GetProgramVersion();
 
 		// Draw the text with word wrapping inside the client area.
+		RECT drawRect;
+		GetClientRect(hWnd, &drawRect);
+		drawRect.left += 10; // Linker Randabstand
+
 		DrawTextW(
 			hdc,
 			info.c_str(),
 			-1,
-			&rect,
+			&drawRect,
 			DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
 
 		EndPaint(hWnd, &ps);
