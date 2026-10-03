@@ -62,7 +62,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Edit Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			180, 10, 120, 25,
+			180, 40, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
 			GetModuleHandleW(nullptr),
@@ -73,15 +73,26 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Reset Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			180, 45, 120, 25,
+			180, 75, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_RESET),
+			GetModuleHandleW(nullptr),
+			nullptr);
+
+		// Create the close button (no title bar, just a close button).
+		CreateWindowW(
+			L"BUTTON",
+			L"X",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			280, 10, 20, 20,
+			hWnd,
+			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_CLOSE),
 			GetModuleHandleW(nullptr),
 			nullptr);
 		return 0;
 
 	case WM_COMMAND:
-		// Handle both Edit Settings and Reset Settings buttons.
+		// Handle Edit Settings, Reset Settings, and Close buttons.
 		if (HIWORD(wParam) == BN_CLICKED)
 		{
 			switch (LOWORD(wParam))
@@ -109,6 +120,11 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 					// Refresh the display to show the new settings.
 					InvalidateRect(hWnd, nullptr, TRUE);
 				}
+				break;
+
+			case ID_CHANGE_SETTINGS_CLOSE:
+				// Close the window when the close button is clicked.
+				DestroyWindow(hWnd);
 				break;
 			}
 		}
@@ -139,7 +155,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		// Build the help text and append the currently active settings.
 		std::wstring info =
-			L"\n\n\n\n\nControls:\n"
+			L"\n\n\n\n\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
@@ -186,3 +202,6 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 }
+
+// Constants for the window's buttons
+#define ID_CHANGE_SETTINGS_CLOSE 1001;

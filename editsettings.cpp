@@ -497,8 +497,8 @@ void OpenChangeSettingsWindow(HWND owner)
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     // Define the desired dimensions of the settings window.
-    const int windowWidth = 310;
-    const int windowHeight = 300;
+    const int windowWidth = 295;
+    const int windowHeight = 260;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;
@@ -518,8 +518,8 @@ void OpenChangeSettingsWindow(HWND owner)
     g_changeSettingsWindow = CreateWindowExW(
         0,
         L"MiniMonitorChangeSettingsWindow",
-        L"Change settings",
-        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+        L"",
+        WS_POPUP,
         x,
         y,
         windowWidth,

@@ -573,7 +573,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 WS_EX_TOPMOST,
                 className,
                 L"Settings",
-                WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+                WS_POPUP,
                 x, y, width, height,
                 NULL,
                 NULL,
