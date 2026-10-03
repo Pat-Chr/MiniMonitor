@@ -1,5 +1,7 @@
 // settingswindow.cpp
-// Info window procedure for showing controls and current settings.
+// Implements the InfoWndProc window procedure for the Settings Window.
+// Handles WM_CREATE, WM_COMMAND, WM_PAINT, WM_CLOSE, and WM_KEYDOWN messages.
+// Displays current settings and provides buttons to edit/reset/close.
 
 #include <windows.h>
 #include <string>

@@ -17,13 +17,9 @@
  * 
  * @remarks
  * - Reads existing config.txt, updates or adds the specified setting line
- * - Expects strings as input
+ * - Expects wide strings (wstring) as input
  * - Writes updated content to config.txt (truncating previous content)
- * - If setting doesn't exist, creates a new entry with the provided name and value. We may not need that in general, but it is a good fallback.
- * - -----
- * - Usage example inside the function: SaveASetting(L"settingName", L"settingValue");
- * - Include the header "saveasetting.h" to use this function in any part of the application.
- * - -----
+ * - If setting doesn't exist, creates a new entry with the provided name and value
  * @returns void
  */
 void SaveASetting(const std::wstring& settingName, const std::wstring& settingValue)
@@ -38,7 +34,7 @@ void SaveASetting(const std::wstring& settingName, const std::wstring& settingVa
     // Read all lines from the configuration file
     while (std::getline(inputFile, line))
     {
-        // Check if this line is the setting entry (case-insensitive name match)
+        // Check if this line is the setting entry (case-sensitive name match)
         if (line.rfind(narrowSettingName, 0) == 0)
         {
             // Replace existing setting line with updated value

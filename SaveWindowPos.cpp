@@ -1,5 +1,7 @@
 // file: SaveWindowPos.cpp
-// Reads the window Position and stores it in the global variable WindowPos as a string in the format "left,top".
+// Saves the current window position to a configuration file.
+// Retrieves the window rectangle and compares with existing settings,
+// only saving if the position has changed. The position is stored as "left,top".
 #include <windows.h>
 #include <strsafe.h>
 #include <stdio.h>
@@ -15,9 +17,9 @@ void SaveASetting(const std::wstring& key, const std::wstring& value);
 // Example usage: SaveASetting(L"settingName", L"settingValue");
 
 /**
- * Global buffer to store window position data.
- * Format: "left,top" (as a string)
- * Maximum size: 256 characters
+ * Global buffer to store the current window position as a string.
+ * Format: "left,top" where left and top are integer coordinates.
+ * Maximum size: 256 characters (including null terminator).
  */
 WCHAR WindowPos[256];
 

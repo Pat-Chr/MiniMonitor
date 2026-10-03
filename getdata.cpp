@@ -1,4 +1,4 @@
-// getdata.cpp
+// file: getdata.cpp
 // Gather system performance metrics (CPU, GPU, RAM) using PDH and GlobalMemoryStatusEx.
 
 #include "MiniMonitor.h"
@@ -26,14 +26,17 @@ extern float gpuRamLoad;
 
 void UpdatePerformanceData()
 {
+    // GPU memory query is initialized on first call.
     static PDH_HQUERY gpuMemoryQuery = nullptr;
     static PDH_HCOUNTER gpuMemoryCounter = nullptr;
     static bool gpuMemoryCounterInitialized = false;
 
     if (!gpuMemoryCounterInitialized) {
         gpuMemoryCounterInitialized = true;
+        // Initialize GPU memory counter for dedicated usage across all adapters.
         if (PdhOpenQueryW(nullptr, 0, &gpuMemoryQuery) != ERROR_SUCCESS ||
             PdhAddEnglishCounterW(gpuMemoryQuery, L"\\GPU Adapter Memory(*)\\Dedicated Usage", 0, &gpuMemoryCounter) != ERROR_SUCCESS) {
+            // Cleanup on initialization failure.
             if (gpuMemoryQuery) {
                 PdhCloseQuery(gpuMemoryQuery);
                 gpuMemoryQuery = nullptr;
@@ -96,7 +99,7 @@ void UpdatePerformanceData()
         }
     }
 
-    // RAM: calculate used physical memory percentage.
+    // RAM: calculate used physical memory percentage using GlobalMemoryStatusEx.
     MEMORYSTATUSEX mem;
     mem.dwLength = sizeof(MEMORYSTATUSEX);
     if (GlobalMemoryStatusEx(&mem) && mem.ullTotalPhys > 0) {
@@ -106,6 +109,7 @@ void UpdatePerformanceData()
         ramLoad = static_cast<float>(pct);
     }
 
+    // GPU RAM: calculate dedicated memory usage percentage across all adapters.
     if (gpuMemoryQuery && gpuMemoryCounter && PdhCollectQueryData(gpuMemoryQuery) == ERROR_SUCCESS) {
         DWORD bufferSize = 0;
         DWORD itemCount = 0;
@@ -129,6 +133,7 @@ void UpdatePerformanceData()
                 uint64_t totalDedicatedMemory = 0;
                 IDXGIFactory4* factory = nullptr;
                 if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))) {
+                    // Enumerate all adapters and sum their dedicated video memory.
                     for (UINT index = 0;; ++index) {
                         IDXGIAdapter1* adapter = nullptr;
                         if (factory->EnumAdapters1(index, &adapter) == DXGI_ERROR_NOT_FOUND) {
