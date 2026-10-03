@@ -535,7 +535,7 @@ void OpenChangeSettingsWindow(HWND owner)
         0,
         L"MiniMonitorChangeSettingsWindow",
         L"",
-        WS_POPUP,
+        WS_POPUP | WS_BORDER,
         x,
         y,
         windowWidth,

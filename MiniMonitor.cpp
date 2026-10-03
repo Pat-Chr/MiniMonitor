@@ -573,7 +573,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 WS_EX_TOPMOST,
                 className,
                 L"Settings",
-                WS_POPUP,
+                WS_POPUP | WS_BORDER,
                 x, y, width, height,
                 NULL,
                 NULL,
