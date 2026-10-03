@@ -21,15 +21,16 @@
 constexpr int ID_CHANGE_SETTINGS = 1001;
 constexpr int ID_SAVE = 1002;
 constexpr int ID_CANCEL = 1003;
-constexpr int ID_TEXT_COLOR_EDIT = 1004;
-constexpr int ID_BG_COLOR_EDIT = 1005;
-constexpr int ID_TEXT_COLOR_PICKER = 1006;
-constexpr int ID_BG_COLOR_PICKER = 1007;
-constexpr int ID_SHOW_BORDER_CHECKBOX = 1008;
-constexpr int ID_SHOW_CPU_LINE_CHECKBOX = 1009;
-constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1010;
-constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1011;
-constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1012;
+constexpr int ID_CHANGE_SETTINGS_CLOSE = 1004;
+constexpr int ID_TEXT_COLOR_EDIT = 1005;
+constexpr int ID_BG_COLOR_EDIT = 1006;
+constexpr int ID_TEXT_COLOR_PICKER = 1007;
+constexpr int ID_BG_COLOR_PICKER = 1008;
+constexpr int ID_SHOW_BORDER_CHECKBOX = 1009;
+constexpr int ID_SHOW_CPU_LINE_CHECKBOX = 1010;
+constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1011;
+constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1012;
+constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1013;
 
 HWND g_changeSettingsWindow = nullptr;
 
@@ -71,7 +72,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"STATIC",
             L"Text Color:",
             WS_CHILD | WS_VISIBLE | SS_LEFT,
-            10, 20, 120, 20,
+            10, 37, 120, 20,
             hWnd,
             reinterpret_cast<HMENU>(0),
             GetModuleHandleW(nullptr),
@@ -81,7 +82,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"EDIT",
             L"",
             WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
-            150, 20, 100, 20,
+            150, 37, 100, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_TEXT_COLOR_EDIT),
             GetModuleHandleW(nullptr),
@@ -92,7 +93,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"...",
             WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-            255, 20, 30, 20,
+            255, 37, 30, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_TEXT_COLOR_PICKER),
             GetModuleHandleW(nullptr),
@@ -103,7 +104,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"STATIC",
             L"Background Color:",
             WS_CHILD | WS_VISIBLE | SS_LEFT,
-            10, 50, 120, 20,
+            10, 60, 120, 20,
             hWnd,
             reinterpret_cast<HMENU>(0),
             GetModuleHandleW(nullptr),
@@ -113,7 +114,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"EDIT",
             L"",
             WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
-            150, 50, 100, 20,
+            150, 60, 100, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_BG_COLOR_EDIT),
             GetModuleHandleW(nullptr),
@@ -124,7 +125,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"...",
             WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-            255, 50, 30, 20,
+            255, 60, 30, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_BG_COLOR_PICKER),
             GetModuleHandleW(nullptr),
@@ -182,6 +183,17 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             10, 185, 290, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_SHOW_VRAM_LINE_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
+        // Create Close button (no title bar, just a close button)
+        CreateWindowW(
+            L"BUTTON",
+            L"X",
+            WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+            264, 10, 20, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_CLOSE),
             GetModuleHandleW(nullptr),
             nullptr);
 
@@ -436,6 +448,10 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             DestroyWindow(hWnd);
             return 0;
         }
+        case ID_CHANGE_SETTINGS_CLOSE:
+            // Close button - destroy the window
+            DestroyWindow(hWnd);
+            return 0;
         case ID_CANCEL:
             DestroyWindow(hWnd);
             return 0;
