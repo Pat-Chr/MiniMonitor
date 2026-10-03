@@ -431,6 +431,14 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         DestroyWindow(hWnd);
         return 0;
 
+    case WM_KEYDOWN:
+        if (wParam == VK_ESCAPE)
+        {
+            DestroyWindow(hWnd);
+            return 0;
+        }
+        break;
+
     case WM_DESTROY:
         g_changeSettingsWindow = nullptr;
         return 0;
