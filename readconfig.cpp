@@ -50,7 +50,11 @@
                 "text_color=0,255,100\n"
                 "bg_color=0,0,0\n"
                 "window_pos=100,100\n"
-                "ShowBorder=true";
+                "ShowBorder=true\n"
+                "ShowCPULine=true\n"
+                "ShowGPULine=true\n"
+                "ShowRAMLine=true\n"
+                "ShowVRAMLine=true\n";
             DWORD written = 0;
             SetFilePointer(h, 0, NULL, FILE_BEGIN);
             WriteFile(h, content, (DWORD)strlen(content), &written, NULL);
