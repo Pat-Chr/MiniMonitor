@@ -53,6 +53,8 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.4.1 - Work in Progress
+	- Single Meters can now be turned on and off in the settings.
 - v1.0.4.0 - 2026-10-02
 	- Switching the Border on and off no longer needs a restart.
 	- Added new VideoRam usage Information.
@@ -109,8 +111,7 @@ RAM:XX%
 - I will make a really really cool logo in SolidWorks someday :)
 - Add an option to change the border of the main window to a different color.
 - Add a transparency option. (This is a bit harder because it also causes the text to be transparent as well)
-- Option checkboxes to turn on and off some of the meters. example "show memory" [x]
-- Idea for faster refresh and a speed option, but i have to test how the code behaves if i go too far. The goal would be 30Hz.
+- Idea for faster refresh and a speed option, but I have to test how the code behaves if i go too far. The goal would be maybe a save 15Hz.
 
 ## Known Bugs and Issues.
 - Saving the changes does not affect the settings/info window until you reopen it.

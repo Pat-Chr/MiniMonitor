@@ -369,15 +369,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::vector<std::wstring> lines;
         wchar_t tmp[128];
 
+        // Reading the setting if the line should be shown or not.
+        //CPU
+        std::wstring StringShowCPULine = L"true";
+        ReadFromSettings(L"ShowCPULine", StringShowCPULine);
+        bool ShowCPULine = (_wcsicmp(StringShowCPULine.c_str(), L"true") == 0);
+        //GPU
+        std::wstring StringShowGPULine = L"true";
+        ReadFromSettings(L"ShowGPULine", StringShowGPULine);
+        bool ShowGPULine = (_wcsicmp(StringShowGPULine.c_str(), L"true") == 0);
+        //RAM
+        std::wstring StringShowRAMLine = L"true";
+        ReadFromSettings(L"ShowRAMLine", StringShowRAMLine);
+        bool ShowRAMLine = (_wcsicmp(StringShowRAMLine.c_str(), L"true") == 0);
+        //VRAM
+        std::wstring StringShowVRAMLine = L"true";
+        ReadFromSettings(L"ShowVRAMLine", StringShowVRAMLine);
+        bool ShowVRAMLine = (_wcsicmp(StringShowVRAMLine.c_str(), L"true") == 0);
+
 		// Adding lines one by one, using swprintf_s to format the text
-        swprintf_s(tmp, _countof(tmp), L"CPU:%3.0f%%", cpuLoad);
-        lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"GPU:%3.0f%%", gpuLoad);
-        lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
-        lines.emplace_back(tmp);
-        swprintf_s(tmp, _countof(tmp), L"VRAM:%3.0f%%", gpuRamLoad);
-        lines.emplace_back(tmp);
+        // If thhe line is turned off, it will not be drawn.
+        if (ShowCPULine) {
+            swprintf_s(tmp, _countof(tmp), L"CPU:%3.0f%%", cpuLoad);
+            lines.emplace_back(tmp);
+        }
+        if (ShowGPULine) {
+            swprintf_s(tmp, _countof(tmp), L"GPU:%3.0f%%", gpuLoad);
+            lines.emplace_back(tmp);
+        }
+        if (ShowRAMLine) {
+            swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
+            lines.emplace_back(tmp);
+        }
+        if (ShowVRAMLine) {
+            swprintf_s(tmp, _countof(tmp), L"VRAM:%3.0f%%", gpuRamLoad);
+            lines.emplace_back(tmp);
+        }
 
 		//Option for the future. Lines can also be hidden by using a bool in the config file.
 
