@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include "saveasetting.h"
+#include "readconfig.h"
 
 // Global function to save a setting to the configuration file. Can be used for any setting.
 void SaveASetting(const std::wstring& key, const std::wstring& value);
@@ -27,7 +28,8 @@ WCHAR WindowPos[256];
  * 
  * @remarks
  * - Retrieves the window rectangle using GetWindowRect()
- * - Stores left and top coordinates in WindowPos buffer
+ * - Reads existing window position from settings
+ * - Only saves if the position has changed
  * 
  * @returns void
  */
@@ -44,7 +46,7 @@ void SaveWindowPos(HWND hwnd)
         return;
     }
 
-    // Format the window position as a string in "left,top" format
+    // Format the new window position as a string in "left,top" format
     StringCchPrintfW(
         WindowPos,
         _countof(WindowPos),
@@ -52,6 +54,13 @@ void SaveWindowPos(HWND hwnd)
         windowRect.left,
         windowRect.top);
 
-    // Use SaveASetting() from saveasetting.h
-    SaveASetting(L"window_pos", WindowPos);
+    // Read the existing window position from settings
+    std::wstring existingWindowPos;
+    ReadFromSettings(L"window_pos", existingWindowPos);
+
+    // Only save if the position has changed
+    if (existingWindowPos != WindowPos)
+    {
+        SaveASetting(L"window_pos", WindowPos);
+    }
 }
