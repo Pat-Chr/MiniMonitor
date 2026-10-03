@@ -112,41 +112,27 @@ void DisableTopBar(HWND hwnd)
     // RECT r; if (GetClientRect(hwnd, &r)) { InvalidateRect(hwnd, NULL, TRUE); UpdateWindow(hwnd); }
 }
 
-// read the window position from the config file, defaulting to (100, 100) if not found
+// Read the window position from settings, defaulting to (100, 100) if not found.
 static POINT ReadWindowPosition()
 {
     constexpr POINT defaultPosition{ 100, 100 };
     constexpr LONG windowWidth = 80;
     constexpr LONG windowHeight = 10;
 
+    // Read window position as string from the settings and parse "x,y"
+    std::wstring posStr;
+    ReadFromSettings(L"window_pos", posStr);
+
     POINT position = defaultPosition;
-    bool positionFound = false;
-
-    std::ifstream config("config.txt");
-    std::string line;
-
-    while (std::getline(config, line))
-    {
-        constexpr const char* prefix = "window_pos=";
-
-        if (line.rfind(prefix, 0) != 0)
-            continue;
-
-        std::stringstream values(
-            line.substr(std::char_traits<char>::length(prefix)));
-
-        char separator = 0;
-
-        if (values >> position.x >> separator >> position.y &&
-            separator == ',')
-        {
-            positionFound = true;
-            break;
+    if (!posStr.empty()) {
+        LONG px = defaultPosition.x;
+        LONG py = defaultPosition.y;
+        int parsed = swscanf_s(posStr.c_str(), L"%ld , %ld", &px, &py);
+        if (parsed == 2) {
+            position.x = px;
+            position.y = py;
         }
     }
-
-    if (!positionFound)
-        return defaultPosition;
 
     RECT windowRect{
         position.x,
@@ -155,7 +141,6 @@ static POINT ReadWindowPosition()
         position.y + windowHeight
     };
 
-    // Check whether the complete window is inside a connected monitor.
     HMONITOR monitor = MonitorFromRect(
         &windowRect,
         MONITOR_DEFAULTTONULL);
