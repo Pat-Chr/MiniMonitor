@@ -258,11 +258,18 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
             COLORREF initialColor = RGB(0, 0, 0);
 
-            // Parse current text color
+            // Parse current text color - convert from RGB format to COLORREF
             char currentColor[256] = {};
             GetWindowTextA(GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT), currentColor, sizeof(currentColor));
             if (currentColor[0])
-                initialColor = HexStringToColor(currentColor);
+            {
+                // Convert "R,G,B" format directly to COLORREF
+                unsigned int r = 0, g = 0, b = 0;
+                if (sscanf_s(currentColor, "%u,%u,%u", &r, &g, &b) == 3)
+                {
+                    initialColor = RGB(static_cast<BYTE>(r), static_cast<BYTE>(g), static_cast<BYTE>(b));
+                }
+            }
 
             cc.lStructSize = sizeof(CHOOSECOLOR);
             cc.hwndOwner = hWnd;
@@ -281,7 +288,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
                     static_cast<unsigned int>(GetBValue(cc.rgbResult)));
 
                 SetWindowTextA(
-                    GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT), // Use ID_BG_COLOR_EDIT in the background picker
+                    GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT),
                     colorRgb);
             }
             return 0;
@@ -296,13 +303,21 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
             RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
             };
+
             COLORREF initialColor = RGB(255, 255, 255);
 
-            // Parse current background color
+            // Parse current background color - convert from RGB format to COLORREF
             char currentColor[256] = {};
             GetWindowTextA(GetDlgItem(hWnd, ID_BG_COLOR_EDIT), currentColor, sizeof(currentColor));
             if (currentColor[0])
-                initialColor = HexStringToColor(currentColor);
+            {
+                // Convert "R,G,B" format directly to COLORREF
+                unsigned int r = 0, g = 0, b = 0;
+                if (sscanf_s(currentColor, "%u,%u,%u", &r, &g, &b) == 3)
+                {
+                    initialColor = RGB(static_cast<BYTE>(r), static_cast<BYTE>(g), static_cast<BYTE>(b));
+                }
+            }
 
             cc.lStructSize = sizeof(CHOOSECOLOR);
             cc.hwndOwner = hWnd;

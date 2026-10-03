@@ -55,6 +55,8 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.4.1 - Work in Progress
 	- Single Meters can now be turned on and off in the settings.
+	- Escape key closes info and settings window now.
+	- Bugfix. The color pickers in the settings now show the correct current colors.
 - v1.0.4.0 - 2026-10-02
 	- Switching the Border on and off no longer needs a restart.
 	- Added new VideoRam usage Information.
