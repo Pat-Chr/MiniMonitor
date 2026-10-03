@@ -26,6 +26,10 @@ constexpr int ID_BG_COLOR_EDIT = 1005;
 constexpr int ID_TEXT_COLOR_PICKER = 1006;
 constexpr int ID_BG_COLOR_PICKER = 1007;
 constexpr int ID_SHOW_BORDER_CHECKBOX = 1008;
+constexpr int ID_SHOW_CPU_LINE_CHECKBOX = 1009;
+constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1010;
+constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1011;
+constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1012;
 
 HWND g_changeSettingsWindow = nullptr;
 
@@ -129,11 +133,55 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
         // Create Show Border checkbox
         CreateWindowW(
             L"BUTTON",
-            L"",
+            L"Show Border",
             WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
             10, 85, 290, 20,
             hWnd,
             reinterpret_cast<HMENU>(ID_SHOW_BORDER_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
+        // Create Show CPU Line checkbox
+        CreateWindowW(
+            L"BUTTON",
+            L"Show CPU Load",
+            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+            10, 110, 290, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_SHOW_CPU_LINE_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
+        // Create Show GPU Line checkbox
+        CreateWindowW(
+            L"BUTTON",
+            L"Show GPU Load",
+            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+            10, 135, 290, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_SHOW_GPU_LINE_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
+        // Create Show RAM Line checkbox
+        CreateWindowW(
+            L"BUTTON",
+            L"Show RAM Load",
+            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+            10, 160, 290, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_SHOW_RAM_LINE_CHECKBOX),
+            GetModuleHandleW(nullptr),
+            nullptr);
+
+        // Create Show VRAM Line checkbox
+        CreateWindowW(
+            L"BUTTON",
+            L"Show VRAM Load",
+            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+            10, 185, 290, 20,
+            hWnd,
+            reinterpret_cast<HMENU>(ID_SHOW_VRAM_LINE_CHECKBOX),
             GetModuleHandleW(nullptr),
             nullptr);
 
@@ -142,7 +190,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Save",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            50, 120, 60, 25,
+            50, 220, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_SAVE),
             GetModuleHandleW(nullptr),
@@ -153,7 +201,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Cancel",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            180, 120, 60, 25,
+            180, 220, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_CANCEL),
             GetModuleHandleW(nullptr),
@@ -288,6 +336,42 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             return 0;
         }
 
+        case ID_SHOW_CPU_LINE_CHECKBOX:
+        {
+            // Checkbox state change - update the display text
+            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+            wchar_t labelText[128] = L"Show CPU Line";
+
+            return 0;
+        }
+
+        case ID_SHOW_GPU_LINE_CHECKBOX:
+        {
+            // Checkbox state change - update the display text
+            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+            wchar_t labelText[128] = L"Show GPU Line";
+
+            return 0;
+        }
+
+        case ID_SHOW_RAM_LINE_CHECKBOX:
+        {
+            // Checkbox state change - update the display text
+            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+            wchar_t labelText[128] = L"Show RAM Line";
+
+            return 0;
+        }
+
+        case ID_SHOW_VRAM_LINE_CHECKBOX:
+        {
+            // Checkbox state change - update the display text
+            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+            wchar_t labelText[128] = L"Show VRAM Line";
+
+            return 0;
+        }
+
         // Save button reads the chosen values and saves them using SaveASetting()
         case ID_SAVE:
         {
@@ -310,6 +394,26 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             int showBorderState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), BM_GETCHECK, 0, 0);
             std::wstring showBorderValue = (showBorderState == BST_CHECKED) ? L"true" : L"false";
             SaveASetting(L"ShowBorder", showBorderValue);
+
+            // Save ShowCPULine setting
+            int showCPULineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_CPU_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
+            std::wstring showCPULineValue = (showCPULineState == BST_CHECKED) ? L"true" : L"false";
+            SaveASetting(L"ShowCPULine", showCPULineValue);
+
+            // Save ShowGPULine setting
+            int showGPULineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_GPU_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
+            std::wstring showGPULineValue = (showGPULineState == BST_CHECKED) ? L"true" : L"false";
+            SaveASetting(L"ShowGPULine", showGPULineValue);
+
+            // Save ShowRAMLine setting
+            int showRAMLineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_RAM_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
+            std::wstring showRAMLineValue = (showRAMLineState == BST_CHECKED) ? L"true" : L"false";
+            SaveASetting(L"ShowRAMLine", showRAMLineValue);
+
+            // Save ShowVRAMLine setting
+            int showVRAMLineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_VRAM_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
+            std::wstring showVRAMLineValue = (showVRAMLineState == BST_CHECKED) ? L"true" : L"false";
+            SaveASetting(L"ShowVRAMLine", showVRAMLineValue);
 
             // Refresh the main window, then close settings window
 
@@ -371,7 +475,7 @@ void OpenChangeSettingsWindow(HWND owner)
 
     // Define the desired dimensions of the settings window.
     const int windowWidth = 310;
-    const int windowHeight = 240;
+    const int windowHeight = 300;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;
@@ -440,8 +544,32 @@ void OpenChangeSettingsWindow(HWND owner)
         int showBorderState = (wShowBorder == L"true") ? BST_CHECKED : BST_UNCHECKED;
         SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
 
-        // Update checkbox label based on current state.
-        const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Show Border";
-        SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
+        //// Update checkbox label based on current state.
+        //const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Show Border";
+        //SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
+
+        // Load the configured ShowCPULine setting and populate the checkbox.
+        std::wstring wShowCPULine;
+        ReadFromSettings(L"ShowCPULine", wShowCPULine);
+        int showCPULineState = (wShowCPULine == L"true") ? BST_CHECKED : BST_UNCHECKED;
+        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_CPU_LINE_CHECKBOX), BM_SETCHECK, showCPULineState, 0);
+
+        // Load the configured ShowGPULine setting and populate the checkbox.
+        std::wstring wShowGPULine;
+        ReadFromSettings(L"ShowGPULine", wShowGPULine);
+        int showGPULineState = (wShowGPULine == L"true") ? BST_CHECKED : BST_UNCHECKED;
+        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_GPU_LINE_CHECKBOX), BM_SETCHECK, showGPULineState, 0);
+
+        // Load the configured ShowRAMLine setting and populate the checkbox.
+        std::wstring wShowRAMLine;
+        ReadFromSettings(L"ShowRAMLine", wShowRAMLine);
+        int showRAMLineState = (wShowRAMLine == L"true") ? BST_CHECKED : BST_UNCHECKED;
+        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_RAM_LINE_CHECKBOX), BM_SETCHECK, showRAMLineState, 0);
+
+        // Load the configured ShowVRAMLine setting and populate the checkbox.
+        std::wstring wShowVRAMLine;
+        ReadFromSettings(L"ShowVRAMLine", wShowVRAMLine);
+        int showVRAMLineState = (wShowVRAMLine == L"true") ? BST_CHECKED : BST_UNCHECKED;
+        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_VRAM_LINE_CHECKBOX), BM_SETCHECK, showVRAMLineState, 0);
     }
 }
