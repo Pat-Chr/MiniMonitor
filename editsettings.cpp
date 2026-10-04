@@ -32,6 +32,22 @@ constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1011;
 constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1012;
 constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1013;
 
+struct CheckboxSetting
+{
+    int controlId;
+    const wchar_t* key;
+    const wchar_t* label;
+    int y;
+};
+
+constexpr CheckboxSetting checkboxSettings[] = {
+    { ID_SHOW_BORDER_CHECKBOX, L"ShowBorder", L"Show Border", 85 },
+    { ID_SHOW_CPU_LINE_CHECKBOX, L"ShowCPULine", L"Show CPU Load", 110 },
+    { ID_SHOW_GPU_LINE_CHECKBOX, L"ShowGPULine", L"Show GPU Load", 135 },
+    { ID_SHOW_RAM_LINE_CHECKBOX, L"ShowRAMLine", L"Show RAM Load", 160 },
+    { ID_SHOW_VRAM_LINE_CHECKBOX, L"ShowVRAMLine", L"Show VRAM Load", 185 }
+};
+
 HWND g_changeSettingsWindow = nullptr;
 
 // Helper function to convert COLORREF to hex string
@@ -57,6 +73,39 @@ COLORREF HexStringToColor(const char* hex)
         );
     }
     return RGB(0, 0, 0);
+}
+
+static void ChooseColorForEdit(HWND window, int editId, COLORREF fallback)
+{
+    COLORREF customColors[16] = {
+        RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255), RGB(255, 255, 0),
+        RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 255), RGB(192, 192, 192),
+        RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
+        RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
+    };
+    char currentColor[256] = {};
+    GetWindowTextA(GetDlgItem(window, editId), currentColor, sizeof(currentColor));
+
+    unsigned int red = 0, green = 0, blue = 0;
+    if (currentColor[0] && sscanf_s(currentColor, "%u,%u,%u", &red, &green, &blue) == 3)
+        fallback = RGB(static_cast<BYTE>(red), static_cast<BYTE>(green), static_cast<BYTE>(blue));
+
+    CHOOSECOLOR color = {};
+    color.lStructSize = sizeof(color);
+    color.hwndOwner = window;
+    color.lpCustColors = customColors;
+    color.rgbResult = fallback;
+    color.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+    if (ChooseColor(&color))
+    {
+        char rgb[32];
+        sprintf_s(rgb, "%u,%u,%u",
+            static_cast<unsigned int>(GetRValue(color.rgbResult)),
+            static_cast<unsigned int>(GetGValue(color.rgbResult)),
+            static_cast<unsigned int>(GetBValue(color.rgbResult)));
+        SetWindowTextA(GetDlgItem(window, editId), rgb);
+    }
 }
 
 void RefreshWindowBorder();
@@ -131,60 +180,11 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             GetModuleHandleW(nullptr),
             nullptr);
 
-        // Create Show Border checkbox
-        CreateWindowW(
-            L"BUTTON",
-            L"Show Border",
-            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-            10, 85, 290, 20,
-            hWnd,
-            reinterpret_cast<HMENU>(ID_SHOW_BORDER_CHECKBOX),
-            GetModuleHandleW(nullptr),
-            nullptr);
-
-        // Create Show CPU Line checkbox
-        CreateWindowW(
-            L"BUTTON",
-            L"Show CPU Load",
-            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-            10, 110, 290, 20,
-            hWnd,
-            reinterpret_cast<HMENU>(ID_SHOW_CPU_LINE_CHECKBOX),
-            GetModuleHandleW(nullptr),
-            nullptr);
-
-        // Create Show GPU Line checkbox
-        CreateWindowW(
-            L"BUTTON",
-            L"Show GPU Load",
-            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-            10, 135, 290, 20,
-            hWnd,
-            reinterpret_cast<HMENU>(ID_SHOW_GPU_LINE_CHECKBOX),
-            GetModuleHandleW(nullptr),
-            nullptr);
-
-        // Create Show RAM Line checkbox
-        CreateWindowW(
-            L"BUTTON",
-            L"Show RAM Load",
-            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-            10, 160, 290, 20,
-            hWnd,
-            reinterpret_cast<HMENU>(ID_SHOW_RAM_LINE_CHECKBOX),
-            GetModuleHandleW(nullptr),
-            nullptr);
-
-        // Create Show VRAM Line checkbox
-        CreateWindowW(
-            L"BUTTON",
-            L"Show VRAM Load",
-            WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-            10, 185, 290, 20,
-            hWnd,
-            reinterpret_cast<HMENU>(ID_SHOW_VRAM_LINE_CHECKBOX),
-            GetModuleHandleW(nullptr),
-            nullptr);
+        for (const auto& setting : checkboxSettings)
+            CreateWindowW(L"BUTTON", setting.label,
+                WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
+                10, setting.y, 290, 20, hWnd,
+                reinterpret_cast<HMENU>(setting.controlId), GetModuleHandleW(nullptr), nullptr);
 
         // Create Close button (no title bar, just a close button)
         CreateWindowW(
@@ -256,148 +256,19 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
     }
 
     case WM_COMMAND:
+        for (const auto& setting : checkboxSettings)
+            if (LOWORD(wParam) == setting.controlId)
+                return 0;
+
         switch (LOWORD(wParam))
         {
         case ID_TEXT_COLOR_PICKER:
-        {
-            CHOOSECOLOR cc = {};
-            COLORREF customColors[16] = {
-            RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255), RGB(255, 255, 0),
-            RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 255), RGB(192, 192, 192),
-            RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
-            RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
-            };
-
-            COLORREF initialColor = RGB(0, 0, 0);
-
-            // Parse current text color - convert from RGB format to COLORREF
-            char currentColor[256] = {};
-            GetWindowTextA(GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT), currentColor, sizeof(currentColor));
-            if (currentColor[0])
-            {
-                // Convert "R,G,B" format directly to COLORREF
-                unsigned int r = 0, g = 0, b = 0;
-                if (sscanf_s(currentColor, "%u,%u,%u", &r, &g, &b) == 3)
-                {
-                    initialColor = RGB(static_cast<BYTE>(r), static_cast<BYTE>(g), static_cast<BYTE>(b));
-                }
-            }
-
-            cc.lStructSize = sizeof(CHOOSECOLOR);
-            cc.hwndOwner = hWnd;
-            cc.lpCustColors = customColors;
-            cc.rgbResult = initialColor;
-            cc.Flags = CC_FULLOPEN | CC_RGBINIT;
-
-            if (ChooseColor(&cc))
-            {
-                char colorRgb[32];
-                sprintf_s(
-                    colorRgb,
-                    "%u,%u,%u",
-                    static_cast<unsigned int>(GetRValue(cc.rgbResult)),
-                    static_cast<unsigned int>(GetGValue(cc.rgbResult)),
-                    static_cast<unsigned int>(GetBValue(cc.rgbResult)));
-
-                SetWindowTextA(
-                    GetDlgItem(hWnd, ID_TEXT_COLOR_EDIT),
-                    colorRgb);
-            }
+            ChooseColorForEdit(hWnd, ID_TEXT_COLOR_EDIT, RGB(0, 0, 0));
             return 0;
-        }
 
         case ID_BG_COLOR_PICKER:
-        {
-            CHOOSECOLOR cc = {};
-            COLORREF customColors[16] = {
-            RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255), RGB(255, 255, 0),
-            RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 255), RGB(192, 192, 192),
-            RGB(128, 128, 128), RGB(0, 0, 0), RGB(255, 192, 192), RGB(192, 255, 192),
-            RGB(192, 192, 255), RGB(255, 255, 192), RGB(255, 192, 255), RGB(192, 255, 255)
-            };
-
-            COLORREF initialColor = RGB(255, 255, 255);
-
-            // Parse current background color - convert from RGB format to COLORREF
-            char currentColor[256] = {};
-            GetWindowTextA(GetDlgItem(hWnd, ID_BG_COLOR_EDIT), currentColor, sizeof(currentColor));
-            if (currentColor[0])
-            {
-                // Convert "R,G,B" format directly to COLORREF
-                unsigned int r = 0, g = 0, b = 0;
-                if (sscanf_s(currentColor, "%u,%u,%u", &r, &g, &b) == 3)
-                {
-                    initialColor = RGB(static_cast<BYTE>(r), static_cast<BYTE>(g), static_cast<BYTE>(b));
-                }
-            }
-
-            cc.lStructSize = sizeof(CHOOSECOLOR);
-            cc.hwndOwner = hWnd;
-            cc.lpCustColors = customColors;
-            cc.rgbResult = initialColor;
-            cc.Flags = CC_FULLOPEN | CC_RGBINIT;
-
-            if (ChooseColor(&cc))
-            {
-                char colorRgb[32];
-                sprintf_s(
-                    colorRgb,
-                    "%u,%u,%u",
-                    static_cast<unsigned int>(GetRValue(cc.rgbResult)),
-                    static_cast<unsigned int>(GetGValue(cc.rgbResult)),
-                    static_cast<unsigned int>(GetBValue(cc.rgbResult)));
-
-                SetWindowTextA(
-                    GetDlgItem(hWnd, ID_BG_COLOR_EDIT),
-                    colorRgb);
-            }
+            ChooseColorForEdit(hWnd, ID_BG_COLOR_EDIT, RGB(255, 255, 255));
             return 0;
-        }
-
-        case ID_SHOW_BORDER_CHECKBOX:
-        {
-            // Checkbox state change - update the display text
-            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show Border";
-
-            return 0;
-        }
-
-        case ID_SHOW_CPU_LINE_CHECKBOX:
-        {
-            // Checkbox state change - update the display text
-            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show CPU Line";
-
-            return 0;
-        }
-
-        case ID_SHOW_GPU_LINE_CHECKBOX:
-        {
-            // Checkbox state change - update the display text
-            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show GPU Line";
-
-            return 0;
-        }
-
-        case ID_SHOW_RAM_LINE_CHECKBOX:
-        {
-            // Checkbox state change - update the display text
-            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show RAM Line";
-
-            return 0;
-        }
-
-        case ID_SHOW_VRAM_LINE_CHECKBOX:
-        {
-            // Checkbox state change - update the display text
-            int checkState = SendMessageW(hWnd, BM_GETCHECK, 0, 0);
-            wchar_t labelText[128] = L"Show VRAM Line";
-
-            return 0;
-        }
 
         // Save button reads the chosen values and saves them using SaveASetting()
         case ID_SAVE:
@@ -417,30 +288,12 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             SaveASetting(L"text_color", textColor);
             SaveASetting(L"bg_color", bgColor);
 
-            // Save ShowBorder setting
-            int showBorderState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_BORDER_CHECKBOX), BM_GETCHECK, 0, 0);
-            std::wstring showBorderValue = (showBorderState == BST_CHECKED) ? L"true" : L"false";
-            SaveASetting(L"ShowBorder", showBorderValue);
-
-            // Save ShowCPULine setting
-            int showCPULineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_CPU_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
-            std::wstring showCPULineValue = (showCPULineState == BST_CHECKED) ? L"true" : L"false";
-            SaveASetting(L"ShowCPULine", showCPULineValue);
-
-            // Save ShowGPULine setting
-            int showGPULineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_GPU_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
-            std::wstring showGPULineValue = (showGPULineState == BST_CHECKED) ? L"true" : L"false";
-            SaveASetting(L"ShowGPULine", showGPULineValue);
-
-            // Save ShowRAMLine setting
-            int showRAMLineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_RAM_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
-            std::wstring showRAMLineValue = (showRAMLineState == BST_CHECKED) ? L"true" : L"false";
-            SaveASetting(L"ShowRAMLine", showRAMLineValue);
-
-            // Save ShowVRAMLine setting
-            int showVRAMLineState = SendMessageW(GetDlgItem(hWnd, ID_SHOW_VRAM_LINE_CHECKBOX), BM_GETCHECK, 0, 0);
-            std::wstring showVRAMLineValue = (showVRAMLineState == BST_CHECKED) ? L"true" : L"false";
-            SaveASetting(L"ShowVRAMLine", showVRAMLineValue);
+            for (const auto& setting : checkboxSettings)
+            {
+                const bool checked = SendMessageW(
+                    GetDlgItem(hWnd, setting.controlId), BM_GETCHECK, 0, 0) == BST_CHECKED;
+                SaveASetting(setting.key, checked ? L"true" : L"false");
+            }
 
             // Refresh the main window, then close settings window
 
@@ -577,38 +430,12 @@ void OpenChangeSettingsWindow(HWND owner)
         bgColorBuffer[convertedLen] = '\0';
         SetWindowTextA(GetDlgItem(g_changeSettingsWindow, ID_BG_COLOR_EDIT), bgColorBuffer);
 
-        // Load the configured ShowBorder setting and populate the checkbox.
-        std::wstring wShowBorder;
-        ReadFromSettings(L"ShowBorder", wShowBorder);
-        int showBorderState = (wShowBorder == L"true") ? BST_CHECKED : BST_UNCHECKED;
-        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), BM_SETCHECK, showBorderState, 0);
-
-        //// Update checkbox label based on current state.
-        //const wchar_t* labelText = (showBorderState == BST_CHECKED) ? L"Show Border" : L"Show Border";
-        //SetWindowTextW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_BORDER_CHECKBOX), labelText);
-
-        // Load the configured ShowCPULine setting and populate the checkbox.
-        std::wstring wShowCPULine;
-        ReadFromSettings(L"ShowCPULine", wShowCPULine);
-        int showCPULineState = (wShowCPULine == L"true") ? BST_CHECKED : BST_UNCHECKED;
-        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_CPU_LINE_CHECKBOX), BM_SETCHECK, showCPULineState, 0);
-
-        // Load the configured ShowGPULine setting and populate the checkbox.
-        std::wstring wShowGPULine;
-        ReadFromSettings(L"ShowGPULine", wShowGPULine);
-        int showGPULineState = (wShowGPULine == L"true") ? BST_CHECKED : BST_UNCHECKED;
-        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_GPU_LINE_CHECKBOX), BM_SETCHECK, showGPULineState, 0);
-
-        // Load the configured ShowRAMLine setting and populate the checkbox.
-        std::wstring wShowRAMLine;
-        ReadFromSettings(L"ShowRAMLine", wShowRAMLine);
-        int showRAMLineState = (wShowRAMLine == L"true") ? BST_CHECKED : BST_UNCHECKED;
-        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_RAM_LINE_CHECKBOX), BM_SETCHECK, showRAMLineState, 0);
-
-        // Load the configured ShowVRAMLine setting and populate the checkbox.
-        std::wstring wShowVRAMLine;
-        ReadFromSettings(L"ShowVRAMLine", wShowVRAMLine);
-        int showVRAMLineState = (wShowVRAMLine == L"true") ? BST_CHECKED : BST_UNCHECKED;
-        SendMessageW(GetDlgItem(g_changeSettingsWindow, ID_SHOW_VRAM_LINE_CHECKBOX), BM_SETCHECK, showVRAMLineState, 0);
+        for (const auto& setting : checkboxSettings)
+        {
+            std::wstring value;
+            ReadFromSettings(setting.key, value);
+            SendMessageW(GetDlgItem(g_changeSettingsWindow, setting.controlId), BM_SETCHECK,
+                value == L"true" ? BST_CHECKED : BST_UNCHECKED, 0);
+        }
     }
 }
