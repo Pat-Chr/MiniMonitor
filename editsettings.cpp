@@ -361,7 +361,11 @@ void OpenChangeSettingsWindow(HWND owner)
     POINT cursorPosition;
     GetCursorPos(&cursorPosition);
 
-    // Get the primary screen dimensions so the window can be kept visible.
+    // Get the monitor under the cursor so the window can be kept visible there.
+    HMONITOR monitor = MonitorFromPoint(cursorPosition, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO monitorInfo = {};
+    monitorInfo.cbSize = sizeof(monitorInfo);
+
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -372,17 +376,19 @@ void OpenChangeSettingsWindow(HWND owner)
     int x = cursorPosition.x;
     int y = cursorPosition.y;
 
-    // Move the window left if it extends past the right screen edge.
-    if (x + windowWidth > screenWidth)
+    RECT workArea = { 0, 0, screenWidth, screenHeight };
+    if (GetMonitorInfoW(monitor, &monitorInfo))
     {
-        x = screenWidth - windowWidth - 10;
+        workArea = monitorInfo.rcWork;
     }
 
-    // Move the window up if it extends past the bottom screen edge.
-    if (y + windowHeight > screenHeight)
-    {
-        y = screenHeight - windowHeight - 10;
-    }
+    constexpr int margin = 10;
+    const int minX = workArea.left + margin;
+    const int minY = workArea.top + margin;
+    const int maxX = workArea.right - windowWidth - margin;
+    const int maxY = workArea.bottom - windowHeight - margin;
+    x = min(max(x, minX), max(minX, maxX));
+    y = min(max(y, minY), max(minY, maxY));
 
     g_changeSettingsWindow = CreateWindowExW(
         0,

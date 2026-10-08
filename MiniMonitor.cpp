@@ -561,13 +561,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int x = rcMain.left + 40;
             int y = rcMain.top + 40;
 
-            // Ensure the window is on-screen (basic clamp)
-            int screenW = GetSystemMetrics(SM_CXSCREEN);
-            int screenH = GetSystemMetrics(SM_CYSCREEN);
-            if (x + width > screenW) x = screenW - width - 40;
-            if (y + height > screenH) y = screenH - height - 40;
-            if (x < 0) x = 40;
-            if (y < 0) y = 40;
+            HMONITOR monitor = MonitorFromRect(&rcMain, MONITOR_DEFAULTTONEAREST);
+            MONITORINFO monitorInfo = {};
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            if (GetMonitorInfoW(monitor, &monitorInfo))
+            {
+                const RECT& workArea = monitorInfo.rcWork;
+                constexpr int margin = 40;
+                const int minX = workArea.left + margin;
+                const int minY = workArea.top + margin;
+                const int maxX = workArea.right - width - margin;
+                const int maxY = workArea.bottom - height - margin;
+                x = min(max(x, minX), max(minX, maxX));
+                y = min(max(y, minY), max(minY, maxY));
+            }
 
             HWND newHwnd = CreateWindowEx(
                 WS_EX_TOPMOST,
@@ -592,62 +599,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
 
-	// if the window is being moved, ensure it stays fully within the monitor's work area
+    // Keep the window within the virtual desktop while allowing it to cross monitor boundaries.
     case WM_MOVING:
     {
         RECT* windowRect = reinterpret_cast<RECT*>(lParam);
         if (windowRect != nullptr)
         {
-            HMONITOR monitor = MonitorFromRect(
-                windowRect,
-                MONITOR_DEFAULTTONEAREST);
+            const int virtualLeft = GetSystemMetrics(SM_XVIRTUALSCREEN);
+            const int virtualTop = GetSystemMetrics(SM_YVIRTUALSCREEN);
+            const int virtualRight = virtualLeft + GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            const int virtualBottom = virtualTop + GetSystemMetrics(SM_CYVIRTUALSCREEN);
+            const int windowWidth = windowRect->right - windowRect->left;
+            const int windowHeight = windowRect->bottom - windowRect->top;
+            constexpr int margin = 5;
 
-            MONITORINFO monitorInfo = {};
-            monitorInfo.cbSize = sizeof(monitorInfo);
+            const int minLeft = virtualLeft + margin;
+            const int maxLeft = max(minLeft, virtualRight - windowWidth - margin);
+            const int minTop = virtualTop + margin;
+            const int maxTop = max(minTop, virtualBottom - windowHeight - margin);
 
-            if (GetMonitorInfoW(monitor, &monitorInfo))
-            {
-                const RECT& workArea = monitorInfo.rcWork;
-                const int windowWidth = windowRect->right - windowRect->left;
-                const int windowHeight = windowRect->bottom - windowRect->top;
-                const int workAreaWidth = workArea.right - workArea.left;
-                const int workAreaHeight = workArea.bottom - workArea.top;
-                constexpr int margin = 5;
-
-                // Handle horizontal constraints (left/right)
-                if (windowWidth >= workAreaWidth)
-                {
-                    windowRect->left = workArea.left + margin;
-                    windowRect->right = workArea.right - margin;
-                }
-                else if (windowRect->left < workArea.left + margin)
-                {
-                    windowRect->left = workArea.left + margin;
-                    windowRect->right = windowRect->left + windowWidth;
-                }
-                else if (windowRect->right > workArea.right - margin)
-                {
-                    windowRect->right = workArea.right - margin;
-                    windowRect->left = windowRect->right - windowWidth;
-                }
-
-                // Handle vertical constraints (top/bottom)
-                if (windowHeight >= workAreaHeight)
-                {
-                    windowRect->top = workArea.top + margin;
-                    windowRect->bottom = workArea.bottom - margin;
-                }
-                else if (windowRect->top < workArea.top + margin)
-                {
-                    windowRect->top = workArea.top + margin;
-                    windowRect->bottom = windowRect->top + windowHeight;
-                }
-                else if (windowRect->bottom > workArea.bottom - margin)
-                {
-                    windowRect->bottom = workArea.bottom - margin;
-                    windowRect->top = windowRect->bottom - windowHeight;
-                }
-            }
+            windowRect->left = min(max(windowRect->left, minLeft), maxLeft);
+            windowRect->right = windowRect->left + windowWidth;
+            windowRect->top = min(max(windowRect->top, minTop), maxTop);
+            windowRect->bottom = windowRect->top + windowHeight;
         }
 
         return TRUE;
