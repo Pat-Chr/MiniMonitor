@@ -8,7 +8,7 @@
 #include <cmath>
 #include <windows.h>
 #include <cstring>
-#include <cstdint>        // <-- neu
+#include <cstdint>
 #include "readconfig.h"
 #include "SaveWindowPos.h"
 #include "settingswindow.h"
