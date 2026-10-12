@@ -53,6 +53,8 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.4.2 - Work in progress.
+	- Background can now be turned to transparent.
 - v1.0.4.1 - 2026-10-08
 	- Single Meters can now be turned on and off in the settings.
 	- Escape key closes info and settings window now.

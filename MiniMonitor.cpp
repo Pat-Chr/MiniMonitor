@@ -4,6 +4,7 @@
 #include <pdhmsg.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <cmath>
 #include <windows.h>
 #include <cstring>
@@ -18,6 +19,7 @@
 
 #define MAX_LOADSTRING 100
 constexpr UINT WM_RESIZE_MONITOR = WM_APP + 1;
+constexpr BYTE TRANSPARENT_HIT_ALPHA = 1;
 
 // Global instances and window text
 HINSTANCE hInst;
@@ -45,33 +47,35 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK    InfoWndProc(HWND, UINT, WPARAM, LPARAM);
 void UpdatePerformanceData();
 
+static void ApplyWindowAppearance(HWND hWnd, bool isTransparent)
+{
+    std::wstring showBorderSetting = L"true";
+    ReadFromSettings(L"ShowBorder", showBorderSetting);
+    const bool showBorder = !isTransparent && (_wcsicmp(showBorderSetting.c_str(), L"true") == 0);
+
+    const LONG_PTR currentStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
+    const LONG_PTR newStyle = showBorder ? currentStyle | WS_BORDER : currentStyle & ~static_cast<LONG_PTR>(WS_BORDER);
+    const LONG_PTR currentExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+    const LONG_PTR newExStyle = isTransparent ? currentExStyle | WS_EX_LAYERED : currentExStyle & ~static_cast<LONG_PTR>(WS_EX_LAYERED);
+
+    if (newStyle != currentStyle || newExStyle != currentExStyle) {
+        SetWindowLongPtr(hWnd, GWL_STYLE, newStyle);
+        SetWindowLongPtr(hWnd, GWL_EXSTYLE, newExStyle);
+        SetWindowPos(hWnd, nullptr, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    }
+
+}
+
 void RefreshWindowBorder()
 {
     if (!g_mainWindow) return;
 
-    // 1. SRead ShowBorder setting from config file
-    std::wstring ShowBorder = L"true";
-    ReadFromSettings(L"ShowBorder", ShowBorder);
-    bool showBorder = (_wcsicmp(ShowBorder.c_str(), L"true") == 0);
+    std::wstring bgTransparent;
+    ReadFromSettings(L"bg_transparent", bgTransparent);
+    const bool isTransparent = bgTransparent.empty() || (_wcsicmp(bgTransparent.c_str(), L"true") == 0);
+    ApplyWindowAppearance(g_mainWindow, isTransparent);
 
-    // 2. Update window Styles
-    if (showBorder) {
-        SetWindowLongPtr(g_mainWindow, GWL_STYLE, GetWindowLongPtr(g_mainWindow, GWL_STYLE) | WS_BORDER);
-    }
-    else {
-        SetWindowLongPtr(g_mainWindow, GWL_STYLE, GetWindowLongPtr(g_mainWindow, GWL_STYLE) & ~WS_BORDER);
-    }
-
-    SetWindowPos(
-        g_mainWindow,
-        nullptr,
-        0,
-        0,
-        0,
-        0,
-        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-
-    // 3. Paint window new
     InvalidateRect(g_mainWindow, NULL, TRUE);
     UpdateWindow(g_mainWindow);
 }
@@ -313,12 +317,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         HDC memoryDc = CreateCompatibleDC(hdc);
         HBITMAP memoryBitmap = nullptr;
         HGDIOBJ previousBitmap = nullptr;
+        void* bitmapPixels = nullptr;
         bool useDoubleBuffer = false;
 
         const int clientWidth = rect.right - rect.left;
         const int clientHeight = rect.bottom - rect.top;
         if (memoryDc && clientWidth > 0 && clientHeight > 0) {
-            memoryBitmap = CreateCompatibleBitmap(hdc, clientWidth, clientHeight);
+            BITMAPINFO bitmapInfo{};
+            bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            bitmapInfo.bmiHeader.biWidth = clientWidth;
+            bitmapInfo.bmiHeader.biHeight = -clientHeight;
+            bitmapInfo.bmiHeader.biPlanes = 1;
+            bitmapInfo.bmiHeader.biBitCount = 32;
+            bitmapInfo.bmiHeader.biCompression = BI_RGB;
+            memoryBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &bitmapPixels, nullptr, 0);
             if (memoryBitmap) {
                 previousBitmap = SelectObject(memoryDc, memoryBitmap);
                 if (previousBitmap && previousBitmap != HGDI_ERROR) {
@@ -359,10 +371,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
 
-		// Draw Background.
-        HBRUSH hBgBrush = CreateSolidBrush(((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
-        FillRect(drawingHdc, &rect, hBgBrush);
-        DeleteObject(hBgBrush);
+        std::wstring bgTransparent;
+        ReadFromSettings(L"bg_transparent", bgTransparent);
+        const bool isTransparent = bgTransparent.empty() || (_wcsicmp(bgTransparent.c_str(), L"true") == 0);
+
+        ApplyWindowAppearance(hWnd, isTransparent);
+
+        COLORREF textColor = RGB(200, 200, 200);
+        std::wstring wTextColor;
+        ReadFromSettings(L"text_color", wTextColor);
+        char textColorBuffer[256] = {};
+        const int convertedTextColor = WideCharToMultiByte(CP_ACP, 0, wTextColor.c_str(), -1,
+            textColorBuffer, _countof(textColorBuffer), NULL, NULL);
+        int textR = 200, textG = 200, textB = 200;
+        if (convertedTextColor > 0 && sscanf_s(textColorBuffer, "%d , %d , %d", &textR, &textG, &textB) == 3) {
+            textR = min(max(textR, 0), 255);
+            textG = min(max(textG, 0), 255);
+            textB = min(max(textB, 0), 255);
+            textColor = RGB(textR, textG, textB);
+        }
+
+        COLORREF transparentRenderColor = RGB(255, 0, 255);
+        if (isTransparent) {
+            const COLORREF candidates[] = {
+                RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 0),
+                RGB(0, 0, 255), RGB(0, 255, 0), RGB(255, 0, 0), RGB(0, 0, 0), RGB(255, 255, 255)
+            };
+            int greatestDistance = -1;
+            for (COLORREF candidate : candidates) {
+                const int redDistance = static_cast<int>(GetRValue(candidate)) - GetRValue(textColor);
+                const int greenDistance = static_cast<int>(GetGValue(candidate)) - GetGValue(textColor);
+                const int blueDistance = static_cast<int>(GetBValue(candidate)) - GetBValue(textColor);
+                const int distance = redDistance * redDistance + greenDistance * greenDistance + blueDistance * blueDistance;
+                if (distance > greatestDistance) {
+                    greatestDistance = distance;
+                    transparentRenderColor = candidate;
+                }
+            }
+
+            HBRUSH hBgBrush = CreateSolidBrush(transparentRenderColor);
+            FillRect(drawingHdc, &rect, hBgBrush);
+            DeleteObject(hBgBrush);
+            SetBkMode(drawingHdc, TRANSPARENT);
+        }
+        else {
+            HBRUSH hBgBrush = CreateSolidBrush(RGB(r, g, b));
+            FillRect(drawingHdc, &rect, hBgBrush);
+            DeleteObject(hBgBrush);
+        }
 
         // Prepare Text (stacked: flexible number of lines)
         // Add more lines by pushing to 'lines' below
@@ -425,30 +481,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // get the text color from the config file
         if (count > 0)
         {
-            std::wstring wTextColor;
-            ReadFromSettings(L"text_color", wTextColor);
-            char textColorBuffer[256] = {};
-            int lentext = static_cast<int>(wTextColor.size());
-            if (lentext >= 255) {
-                lentext = 254;
-            }
-            int convertedLentext = WideCharToMultiByte(CP_ACP, 0, wTextColor.c_str(), -1,
-                textColorBuffer, 256, NULL, NULL);
-            textColorBuffer[convertedLentext] = '\0';
-
-            // Parse config "R, G, B" and apply as COLORREF
-            int r = 200, g = 200, b = 200; // default
-            int parsed = sscanf_s(textColorBuffer, "%d , %d , %d", &r, &g, &b);
-            if (parsed == 3) {
-                if (r < 0) r = 0; if (r > 255) r = 255;
-                if (g < 0) g = 0; if (g > 255) g = 255;
-                if (b < 0) b = 0; if (b > 255) b = 255;
-                SetTextColor(drawingHdc, ((COLORREF)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16))));
-            } else {
-                // Fallback color in case of parsing failure
-                SetTextColor(drawingHdc, ((COLORREF)(((BYTE)(200) | ((WORD)((BYTE)(200)) << 8)) | (((DWORD)(BYTE)(200)) << 16))));
-            }
-            SetBkMode(drawingHdc, TRANSPARENT);
+            SetTextColor(drawingHdc, textColor);
+            if (isTransparent)
+                SetBkMode(drawingHdc, TRANSPARENT);
 
             // Measure one line height using current font
             TEXTMETRIC tm;
@@ -483,7 +518,61 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if (useDoubleBuffer) {
+        if (useDoubleBuffer && isTransparent && bitmapPixels) {
+            auto* pixels = static_cast<std::uint32_t*>(bitmapPixels);
+            const int backgroundRed = GetRValue(transparentRenderColor);
+            const int backgroundGreen = GetGValue(transparentRenderColor);
+            const int backgroundBlue = GetBValue(transparentRenderColor);
+            const int foregroundRed = GetRValue(textColor);
+            const int foregroundGreen = GetGValue(textColor);
+            const int foregroundBlue = GetBValue(textColor);
+
+            for (int i = 0; i < clientWidth * clientHeight; ++i) {
+                const int sourceBlue = static_cast<int>(pixels[i] & 0xFF);
+                const int sourceGreen = static_cast<int>((pixels[i] >> 8) & 0xFF);
+                const int sourceRed = static_cast<int>((pixels[i] >> 16) & 0xFF);
+
+                double coverage = 0.0;
+                int channelCount = 0;
+                const auto addCoverage = [&coverage, &channelCount](int source, int background, int foreground) {
+                    if (foreground != background) {
+                        double channelCoverage = static_cast<double>(source - background) / (foreground - background);
+                        if (channelCoverage < 0.0) channelCoverage = 0.0;
+                        if (channelCoverage > 1.0) channelCoverage = 1.0;
+                        coverage += channelCoverage;
+                        ++channelCount;
+                    }
+                };
+
+                addCoverage(sourceRed, backgroundRed, foregroundRed);
+                addCoverage(sourceGreen, backgroundGreen, foregroundGreen);
+                addCoverage(sourceBlue, backgroundBlue, foregroundBlue);
+                coverage = channelCount > 0 ? coverage / channelCount : 0.0;
+
+                int alphaValue = static_cast<int>(coverage * 255.0 + 0.5);
+                if (alphaValue < TRANSPARENT_HIT_ALPHA) alphaValue = TRANSPARENT_HIT_ALPHA;
+                if (alphaValue > 255) alphaValue = 255;
+                const BYTE alpha = static_cast<BYTE>(alphaValue);
+                const BYTE red = static_cast<BYTE>((foregroundRed * alpha + 127) / 255);
+                const BYTE green = static_cast<BYTE>((foregroundGreen * alpha + 127) / 255);
+                const BYTE blue = static_cast<BYTE>((foregroundBlue * alpha + 127) / 255);
+                pixels[i] = (static_cast<std::uint32_t>(alpha) << 24) |
+                    (static_cast<std::uint32_t>(red) << 16) |
+                    (static_cast<std::uint32_t>(green) << 8) | blue;
+            }
+
+            RECT windowRect{};
+            GetWindowRect(hWnd, &windowRect);
+            POINT destination{ windowRect.left, windowRect.top };
+            POINT source{ 0, 0 };
+            SIZE size{ clientWidth, clientHeight };
+            HDC screenDc = GetDC(nullptr);
+            BLENDFUNCTION blend{ AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+            UpdateLayeredWindow(hWnd, screenDc, &destination, &size, memoryDc, &source,
+                0, &blend, ULW_ALPHA);
+            ReleaseDC(nullptr, screenDc);
+        }
+        else if (useDoubleBuffer) {
             BitBlt(hdc, 0, 0, clientWidth, clientHeight, memoryDc, 0, 0, SRCCOPY);
         }
 

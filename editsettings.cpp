@@ -31,6 +31,7 @@ constexpr int ID_SHOW_CPU_LINE_CHECKBOX = 1010;
 constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1011;
 constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1012;
 constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1013;
+constexpr int ID_BG_TRANSPARENT_CHECKBOX = 1014;
 
 struct CheckboxSetting
 {
@@ -45,7 +46,8 @@ constexpr CheckboxSetting checkboxSettings[] = {
     { ID_SHOW_CPU_LINE_CHECKBOX, L"ShowCPULine", L"Show CPU Load", 110 },
     { ID_SHOW_GPU_LINE_CHECKBOX, L"ShowGPULine", L"Show GPU Load", 135 },
     { ID_SHOW_RAM_LINE_CHECKBOX, L"ShowRAMLine", L"Show RAM Load", 160 },
-    { ID_SHOW_VRAM_LINE_CHECKBOX, L"ShowVRAMLine", L"Show VRAM Load", 185 }
+    { ID_SHOW_VRAM_LINE_CHECKBOX, L"ShowVRAMLine", L"Show VRAM Load", 185 },
+    { ID_BG_TRANSPARENT_CHECKBOX, L"bg_transparent", L"Transparent Background", 210 }
 };
 
 HWND g_changeSettingsWindow = nullptr;
@@ -202,7 +204,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Save",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            50, 220, 60, 25,
+            50, 245, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_SAVE),
             GetModuleHandleW(nullptr),
@@ -213,7 +215,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Cancel",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            180, 220, 60, 25,
+            180, 245, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_CANCEL),
             GetModuleHandleW(nullptr),
@@ -371,7 +373,7 @@ void OpenChangeSettingsWindow(HWND owner)
 
     // Define the desired dimensions of the settings window.
     const int windowWidth = 295;
-    const int windowHeight = 260;
+    const int windowHeight = 285;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;
@@ -440,8 +442,11 @@ void OpenChangeSettingsWindow(HWND owner)
         {
             std::wstring value;
             ReadFromSettings(setting.key, value);
+            const bool checked = value.empty()
+                ? setting.controlId == ID_BG_TRANSPARENT_CHECKBOX
+                : _wcsicmp(value.c_str(), L"true") == 0;
             SendMessageW(GetDlgItem(g_changeSettingsWindow, setting.controlId), BM_SETCHECK,
-                value == L"true" ? BST_CHECKED : BST_UNCHECKED, 0);
+                checked ? BST_CHECKED : BST_UNCHECKED, 0);
         }
     }
 }
