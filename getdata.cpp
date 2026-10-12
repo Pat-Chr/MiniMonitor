@@ -26,17 +26,14 @@ extern float gpuRamLoad;
 
 void UpdatePerformanceData()
 {
-    // GPU memory query is initialized on first call.
     static PDH_HQUERY gpuMemoryQuery = nullptr;
     static PDH_HCOUNTER gpuMemoryCounter = nullptr;
     static bool gpuMemoryCounterInitialized = false;
 
     if (!gpuMemoryCounterInitialized) {
         gpuMemoryCounterInitialized = true;
-        // Initialize GPU memory counter for dedicated usage across all adapters.
         if (PdhOpenQueryW(nullptr, 0, &gpuMemoryQuery) != ERROR_SUCCESS ||
             PdhAddEnglishCounterW(gpuMemoryQuery, L"\\GPU Adapter Memory(*)\\Dedicated Usage", 0, &gpuMemoryCounter) != ERROR_SUCCESS) {
-            // Cleanup on initialization failure.
             if (gpuMemoryQuery) {
                 PdhCloseQuery(gpuMemoryQuery);
                 gpuMemoryQuery = nullptr;
@@ -109,8 +106,61 @@ void UpdatePerformanceData()
         ramLoad = static_cast<float>(pct);
     }
 
-    // GPU RAM: calculate dedicated memory usage percentage across all adapters.
-    if (gpuMemoryQuery && gpuMemoryCounter && PdhCollectQueryData(gpuMemoryQuery) == ERROR_SUCCESS) {
+    // GPU RAM: query system-wide usage for only the adapter driving the primary display.
+    LUID primaryAdapterLuid{};
+    SIZE_T primaryAdapterMemory = 0;
+    bool foundPrimaryAdapter = false;
+    IDXGIFactory4* factory = nullptr;
+    if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))) {
+        for (UINT adapterIndex = 0;; ++adapterIndex) {
+            IDXGIAdapter1* adapter = nullptr;
+            if (factory->EnumAdapters1(adapterIndex, &adapter) == DXGI_ERROR_NOT_FOUND) {
+                break;
+            }
+            if (!adapter) {
+                continue;
+            }
+
+            bool drivesPrimaryDisplay = false;
+            for (UINT outputIndex = 0;; ++outputIndex) {
+                IDXGIOutput* output = nullptr;
+                if (FAILED(adapter->EnumOutputs(outputIndex, &output)) || !output) {
+                    break;
+                }
+
+                DXGI_OUTPUT_DESC outputDescription{};
+                if (SUCCEEDED(output->GetDesc(&outputDescription)) && outputDescription.Monitor) {
+                    MONITORINFO monitorInfo{};
+                    monitorInfo.cbSize = sizeof(monitorInfo);
+                    if (GetMonitorInfoW(outputDescription.Monitor, &monitorInfo) &&
+                        (monitorInfo.dwFlags & MONITORINFOF_PRIMARY)) {
+                        drivesPrimaryDisplay = true;
+                    }
+                }
+                output->Release();
+                if (drivesPrimaryDisplay) {
+                    break;
+                }
+            }
+
+            if (drivesPrimaryDisplay) {
+                DXGI_ADAPTER_DESC1 description{};
+                if (SUCCEEDED(adapter->GetDesc1(&description))) {
+                    primaryAdapterLuid = description.AdapterLuid;
+                    primaryAdapterMemory = description.DedicatedVideoMemory;
+                    foundPrimaryAdapter = true;
+                }
+                adapter->Release();
+                break;
+            }
+
+            adapter->Release();
+        }
+        factory->Release();
+    }
+
+    if (foundPrimaryAdapter && primaryAdapterMemory > 0 && gpuMemoryQuery && gpuMemoryCounter &&
+        PdhCollectQueryData(gpuMemoryQuery) == ERROR_SUCCESS) {
         DWORD bufferSize = 0;
         DWORD itemCount = 0;
         PDH_STATUS status = PdhGetFormattedCounterArrayW(
@@ -123,42 +173,24 @@ void UpdatePerformanceData()
                 gpuMemoryCounter, PDH_FMT_LARGE, &bufferSize, &itemCount, items);
 
             if (status == ERROR_SUCCESS) {
-                uint64_t totalUsage = 0;
+                wchar_t luidPrefix[64]{};
+                swprintf_s(luidPrefix, L"luid_0x%08X_0x%08X",
+                    static_cast<unsigned int>(primaryAdapterLuid.HighPart),
+                    static_cast<unsigned int>(primaryAdapterLuid.LowPart));
+
+                uint64_t primaryAdapterUsage = 0;
+                const size_t prefixLength = wcslen(luidPrefix);
                 for (DWORD i = 0; i < itemCount; ++i) {
-                    if (items[i].FmtValue.CStatus == ERROR_SUCCESS && items[i].FmtValue.largeValue > 0) {
-                        totalUsage += static_cast<uint64_t>(items[i].FmtValue.largeValue);
+                    if (items[i].FmtValue.CStatus == ERROR_SUCCESS && items[i].szName &&
+                        _wcsnicmp(items[i].szName, luidPrefix, prefixLength) == 0 &&
+                        items[i].FmtValue.largeValue > 0) {
+                        primaryAdapterUsage += static_cast<uint64_t>(items[i].FmtValue.largeValue);
                     }
                 }
 
-                uint64_t totalDedicatedMemory = 0;
-                IDXGIFactory4* factory = nullptr;
-                if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory)))) {
-                    // Enumerate all adapters and sum their dedicated video memory.
-                    for (UINT index = 0;; ++index) {
-                        IDXGIAdapter1* adapter = nullptr;
-                        if (factory->EnumAdapters1(index, &adapter) == DXGI_ERROR_NOT_FOUND) {
-                            break;
-                        }
-                        if (!adapter) {
-                            continue;
-                        }
-
-                        DXGI_ADAPTER_DESC1 description{};
-                        if (SUCCEEDED(adapter->GetDesc1(&description)) &&
-                            !(description.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)) {
-                            totalDedicatedMemory += description.DedicatedVideoMemory;
-                        }
-
-                        adapter->Release();
-                    }
-                    factory->Release();
-                }
-
-                if (totalDedicatedMemory > 0) {
-                    const double percentage =
-                        (static_cast<double>(totalUsage) / static_cast<double>(totalDedicatedMemory)) * 100.0;
-                    gpuRamLoad = static_cast<float>(std::clamp(percentage, 0.0, 100.0));
-                }
+                const double percentage =
+                    (static_cast<double>(primaryAdapterUsage) / static_cast<double>(primaryAdapterMemory)) * 100.0;
+                gpuRamLoad = static_cast<float>(std::clamp(percentage, 0.0, 100.0));
             }
         }
     }

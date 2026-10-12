@@ -54,6 +54,7 @@ RAM:XX%
 
 ## 🗒️ Changelog
 - v1.0.4.2 - Work in progress.
+	- Bugfix. The GPU Memory of another iGPU doesn't get added to the overall value anymore.
 	- Background can now be turned to transparent.
 - v1.0.4.1 - 2026-10-08
 	- Single Meters can now be turned on and off in the settings.
