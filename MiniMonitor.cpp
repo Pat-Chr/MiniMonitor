@@ -1,19 +1,13 @@
 #include "framework.h"
 #include "MiniMonitor.h"
 #include <pdh.h>
-#include <pdhmsg.h>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <cmath>
 #include <windows.h>
 #include <cstring>
 #include <cstdint>
 #include "readconfig.h"
 #include "SaveWindowPos.h"
-#include "settingswindow.h"
-#include <fstream>
-#include <sstream>
 
 #pragma comment(lib, "pdh.lib")
 
