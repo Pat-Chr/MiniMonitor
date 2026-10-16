@@ -53,6 +53,8 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.4.3 - Work in progress.
+	- Code cleanup and optimization.
 - v1.0.4.2 - 2026-10-12
 	- Bugfix. The GPU Memory of another iGPU doesn't get added to the overall value anymore.
 	- Background can now be turned to transparent.
