@@ -1,14 +1,12 @@
-﻿// file: E:\Visual Studio Projects\repos\MiniMonitor\editsettings.cpp
+﻿// file: editsettings.cpp
+// file: E:\Visual Studio Projects\repos\MiniMonitor\editsettings.cpp
 // file: editsettings.cpp
 // Edit settings window procedure for showing controls / settings
 
 #include <windows.h>
 #include <string>
-#include <vector>
 #include <winver.h>
 #include <commdlg.h>
-#include <fstream>
-#include <cstdlib>
 #include <cstring>
 #include <cwchar>
 

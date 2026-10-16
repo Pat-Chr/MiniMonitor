@@ -1,10 +1,7 @@
-﻿// file: SaveASetting.cpp
+﻿// file: saveasetting.cpp
+// file: SaveASetting.cpp
 // Generic function to save any setting to a configuration file.
-#include <windows.h>
-#include <strsafe.h>
-#include <stdio.h>
 #include <fstream>
-#include <sstream>
 #include <vector>
 #include <string>
 #include "saveasetting.h"

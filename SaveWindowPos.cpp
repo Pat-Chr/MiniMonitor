@@ -1,13 +1,10 @@
 // file: SaveWindowPos.cpp
+// file: SaveWindowPos.cpp
 // Saves the current window position to a configuration file.
 // Retrieves the window rectangle and compares with existing settings,
 // only saving if the position has changed. The position is stored as "left,top".
 #include <windows.h>
 #include <strsafe.h>
-#include <stdio.h>
-#include <fstream>
-#include <sstream>
-#include <vector>
 #include <string>
 #include "saveasetting.h"
 #include "readconfig.h"
