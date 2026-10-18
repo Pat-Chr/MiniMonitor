@@ -49,6 +49,8 @@ constexpr CheckboxSetting checkboxSettings[] = {
 };
 
 HWND g_changeSettingsWindow = nullptr;
+static bool g_isDragging = false;
+static POINT g_dragOffset = { 0, 0 };
 
 // Helper function to convert COLORREF to hex string
 void ColorToHexString(COLORREF color, char* buffer, size_t size)
@@ -322,6 +324,46 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             return 0;
         }
         break;
+
+    case WM_LBUTTONDOWN:
+    {
+        // Start dragging from client area; compute offset to window origin
+        g_isDragging = true;
+        POINT cursorPosition = {
+            static_cast<short>(LOWORD(lParam)),
+            static_cast<short>(HIWORD(lParam))
+        };
+        ClientToScreen(hWnd, &cursorPosition);
+        RECT windowRect;
+        GetWindowRect(hWnd, &windowRect);
+        g_dragOffset.x = cursorPosition.x - windowRect.left;
+        g_dragOffset.y = cursorPosition.y - windowRect.top;
+        return 0;
+    }
+
+    case WM_MOUSEMOVE:
+        if (g_isDragging)
+        {
+            POINT cursorPosition = {
+                static_cast<short>(LOWORD(lParam)),
+                static_cast<short>(HIWORD(lParam))
+            };
+            ClientToScreen(hWnd, &cursorPosition);
+            RECT windowRect;
+            GetWindowRect(hWnd, &windowRect);
+            MoveWindow(
+                hWnd,
+                cursorPosition.x - g_dragOffset.x,
+                cursorPosition.y - g_dragOffset.y,
+                windowRect.right - windowRect.left,
+                windowRect.bottom - windowRect.top,
+                TRUE);
+        }
+        return 0;
+
+    case WM_LBUTTONUP:
+        g_isDragging = false;
+        return 0;
 
     case WM_DESTROY:
         g_changeSettingsWindow = nullptr;

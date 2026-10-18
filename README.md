@@ -55,6 +55,7 @@ RAM:XX%
 ## 🗒️ Changelog
 - v1.0.4.3 - Work in progress.
 	- Code cleanup and optimization.
+	- Both settings windows are now dragable.
 - v1.0.4.2 - 2026-10-12
 	- Bugfix. The GPU Memory of another iGPU doesn't get added to the overall value anymore.
 	- Background can now be turned to transparent.

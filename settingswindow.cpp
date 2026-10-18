@@ -1,3 +1,4 @@
+// file: settingswindow.cpp
 // settingswindow.cpp
 // Implements the InfoWndProc window procedure for the Settings Window.
 // Handles WM_CREATE, WM_COMMAND, WM_PAINT, WM_CLOSE, and WM_KEYDOWN messages.
@@ -18,6 +19,12 @@ namespace
 {
 	// Tracks the settings window instance managed by the application.
 	HWND g_changeSettingsWindow = nullptr;
+
+	// Flag to track if dragging is active
+	bool g_isDragging = false;
+	
+	// Store original mouse position for drag offset
+	POINT g_dragOffset = { 0, 0 };
 }
 
 // Retrieves the file version embedded in the running executable.
@@ -199,6 +206,48 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			return 0;
 		}
 		break;
+
+	case WM_NCLBUTTONDOWN:
+		// Handle drag when clicking on the window frame (title bar area).
+		g_isDragging = true;
+		RECT windowRect;
+		GetWindowRect(hWnd, &windowRect);
+		g_dragOffset.x = LOWORD(lParam) - windowRect.left;
+		g_dragOffset.y = HIWORD(lParam) - windowRect.top;
+		return 0;
+
+	case WM_LBUTTONDOWN:
+		// Handle drag when clicking anywhere in the client area.
+		g_isDragging = true;
+		{
+			RECT windowRect2;
+			GetWindowRect(hWnd, &windowRect2);
+			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+			ClientToScreen(hWnd, &pt);
+			g_dragOffset.x = pt.x - windowRect2.left;
+			g_dragOffset.y = pt.y - windowRect2.top;
+		}
+		return 0;
+
+	case WM_MOUSEMOVE:
+		if (g_isDragging)
+		{
+			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+			ClientToScreen(hWnd, &pt);
+			int newX = pt.x - g_dragOffset.x;
+			int newY = pt.y - g_dragOffset.y;
+			RECT rc;
+			GetWindowRect(hWnd, &rc);
+			int w = rc.right - rc.left;
+			int h = rc.bottom - rc.top;
+			MoveWindow(hWnd, newX, newY, w, h, TRUE);
+		}
+		return 0;
+
+	case WM_LBUTTONUP:
+		// Release drag tracking when mouse button is released.
+		g_isDragging = false;
+		return 0;
 
 	case WM_DESTROY:
 		// No additional cleanup is currently required for this window.
