@@ -472,9 +472,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		addLoadLine(ShowRAMLine, L"RAM", ramLoad);
 		addLoadLine(ShowVRAMLine, L"VRAM", gpuRamLoad);
 
-        // Count how many swprintf_s-produced lines we have
-        int count = static_cast<int>(lines.size());
-        int swprintfCount = count; // number of swprintf_s calls that produced lines here
+		if (lines.empty()) {
+			lines.push_back({ L"Monitor off", textColor });
+		}
+
+		// Count how many swprintf_s-produced lines we have
+		int count = static_cast<int>(lines.size());
+		int swprintfCount = count; // number of swprintf_s calls that produced lines here
 
         if (count > 0)
         {
