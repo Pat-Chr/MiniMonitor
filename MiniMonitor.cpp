@@ -4,15 +4,18 @@
 #include <string>
 #include <vector>
 #include <windows.h>
+#include <shellapi.h>
 #include <cstring>
 #include <cstdint>
 #include "readconfig.h"
 #include "SaveWindowPos.h"
 
 #pragma comment(lib, "pdh.lib")
+#pragma comment(lib, "shell32.lib")
 
 #define MAX_LOADSTRING 100
 constexpr UINT WM_RESIZE_MONITOR = WM_APP + 1;
+constexpr UINT WM_TRAYICON = WM_APP + 2;
 constexpr BYTE TRANSPARENT_HIT_ALPHA = 1;
 
 // Global instances and window text
@@ -20,6 +23,8 @@ HINSTANCE hInst;
 HWND g_mainWindow = nullptr;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
+NOTIFYICONDATAW g_trayIconData{};
+bool g_trayIconAdded = false;
 
 // PDH performance counters for CPU and GPU
 PDH_HQUERY cpuQuery;
@@ -108,6 +113,36 @@ void DisableTopBar(HWND hwnd)
 
     // In case a custom control draws a top bar, try resizing client area (optional)
     // RECT r; if (GetClientRect(hwnd, &r)) { InvalidateRect(hwnd, NULL, TRUE); UpdateWindow(hwnd); }
+}
+
+static void AddTrayIcon(HWND hWnd)
+{
+    ZeroMemory(&g_trayIconData, sizeof(g_trayIconData));
+    g_trayIconData.cbSize = sizeof(g_trayIconData);
+    g_trayIconData.hWnd = hWnd;
+    g_trayIconData.uID = 1;
+    g_trayIconData.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    g_trayIconData.uCallbackMessage = WM_TRAYICON;
+    g_trayIconData.hIcon = static_cast<HICON>(LoadImageW(hInst, MAKEINTRESOURCEW(IDI_SMALL), IMAGE_ICON,
+        GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
+    wcscpy_s(g_trayIconData.szTip, L"MiniMonitor");
+
+    if (Shell_NotifyIconW(NIM_ADD, &g_trayIconData)) {
+        g_trayIconAdded = true;
+    }
+}
+
+static void RemoveTrayIcon()
+{
+    if (g_trayIconAdded) {
+        Shell_NotifyIconW(NIM_DELETE, &g_trayIconData);
+        g_trayIconAdded = false;
+    }
+
+    if (g_trayIconData.hIcon) {
+        DestroyIcon(g_trayIconData.hIcon);
+        g_trayIconData.hIcon = nullptr;
+    }
 }
 
 // Read the window position from settings, defaulting to (100, 100) if not found.
@@ -267,6 +302,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     // testing needed to ensure the timer is not too frequent or too slow.
     SetTimer(hWnd, 1, 200, NULL);
 
+    AddTrayIcon(hWnd);
+
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
@@ -277,6 +314,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_TRAYICON:
+        if (lParam == WM_LBUTTONUP || lParam == WM_LBUTTONDBLCLK) {
+            ShowWindow(hWnd, SW_SHOWNORMAL);
+            SetForegroundWindow(hWnd);
+        }
+        else if (lParam == WM_RBUTTONUP) {
+            SetForegroundWindow(hWnd);
+            PostMessage(hWnd, WM_RBUTTONUP, 0, 0);
+        }
+        return 0;
+
     case WM_TIMER:
         UpdatePerformanceData();
         InvalidateRect(hWnd, NULL, FALSE); // Trigger a repaint
@@ -703,6 +751,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
 
     case WM_DESTROY:
+        RemoveTrayIcon();
         PdhCloseQuery(cpuQuery);
         PdhCloseQuery(gpuQuery);
         PostQuitMessage(0);
