@@ -70,7 +70,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		CreateWindowW(
 			L"BUTTON",
 			L"Edit Settings",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
 			95, 145, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
@@ -81,7 +81,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		CreateWindowW(
 			L"BUTTON",
 			L"Reset Settings",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
 			95, 178, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_RESET),
@@ -92,13 +92,37 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		CreateWindowW(
 			L"BUTTON",
 			L"X",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
 			280, 10, 20, 20,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_CLOSE),
 			GetModuleHandleW(nullptr),
 			nullptr);
 		return 0;
+
+	case WM_DRAWITEM:
+	{
+		auto* drawItem = reinterpret_cast<DRAWITEMSTRUCT*>(lParam);
+		if (drawItem->CtlType != ODT_BUTTON)
+			break;
+
+		FillRect(drawItem->hDC, &drawItem->rcItem, static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+		FrameRect(drawItem->hDC, &drawItem->rcItem, static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH)));
+
+		wchar_t buttonText[64] = {};
+		GetWindowTextW(drawItem->hwndItem, buttonText, static_cast<int>(sizeof(buttonText) / sizeof(buttonText[0])));
+		SetTextColor(drawItem->hDC, RGB(0, 255, 0));
+		SetBkMode(drawItem->hDC, TRANSPARENT);
+		DrawTextW(drawItem->hDC, buttonText, -1, &drawItem->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+		if (drawItem->itemState & ODS_FOCUS)
+		{
+			RECT focusRect = drawItem->rcItem;
+			InflateRect(&focusRect, -4, -4);
+			DrawFocusRect(drawItem->hDC, &focusRect);
+		}
+		return TRUE;
+	}
 
 	case WM_COMMAND:
 		// Handle Edit Settings, Reset Settings, and Close buttons.
@@ -152,8 +176,8 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		FillRect(hdc, &rect, hBg);
 		DeleteObject(hBg);
 
-		// Configure white, transparent text so the black background remains visible.
-		SetTextColor(hdc, RGB(255, 255, 255));
+		// Configure green, transparent text so the black background remains visible.
+		SetTextColor(hdc, RGB(0, 255, 0));
 		SetBkMode(hdc, TRANSPARENT);
 
 		// Build the help text.

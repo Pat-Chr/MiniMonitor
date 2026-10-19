@@ -229,7 +229,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
     case WM_CTLCOLOREDIT:
     {
         HDC hdc = reinterpret_cast<HDC>(wParam);
-        SetTextColor(hdc, RGB(255, 255, 255));
+        SetTextColor(hdc, RGB(0, 255, 0));
         SetBkColor(hdc, RGB(0, 0, 0));
         SetBkMode(hdc, message == WM_CTLCOLORSTATIC ? TRANSPARENT : OPAQUE);
         return reinterpret_cast<INT_PTR>(GetStockObject(BLACK_BRUSH));
@@ -246,7 +246,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
         wchar_t buttonText[64] = {};
         GetWindowTextW(drawItem->hwndItem, buttonText, static_cast<int>(sizeof(buttonText) / sizeof(buttonText[0])));
-        SetTextColor(drawItem->hDC, RGB(255, 255, 255));
+        SetTextColor(drawItem->hDC, RGB(0, 255, 0));
         SetBkMode(drawItem->hDC, TRANSPARENT);
         DrawTextW(drawItem->hDC, buttonText, -1, &drawItem->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
