@@ -30,6 +30,7 @@ constexpr int ID_SHOW_GPU_LINE_CHECKBOX = 1011;
 constexpr int ID_SHOW_RAM_LINE_CHECKBOX = 1012;
 constexpr int ID_SHOW_VRAM_LINE_CHECKBOX = 1013;
 constexpr int ID_BG_TRANSPARENT_CHECKBOX = 1014;
+constexpr int ID_HIGHLIGHT_HIGH_LOAD_CHECKBOX = 1015;
 
 struct CheckboxSetting
 {
@@ -45,7 +46,8 @@ constexpr CheckboxSetting checkboxSettings[] = {
     { ID_SHOW_GPU_LINE_CHECKBOX, L"ShowGPULine", L"Show GPU Load", 135 },
     { ID_SHOW_RAM_LINE_CHECKBOX, L"ShowRAMLine", L"Show RAM Load", 160 },
     { ID_SHOW_VRAM_LINE_CHECKBOX, L"ShowVRAMLine", L"Show VRAM Load", 185 },
-    { ID_BG_TRANSPARENT_CHECKBOX, L"bg_transparent", L"Transparent Background", 210 }
+    { ID_BG_TRANSPARENT_CHECKBOX, L"bg_transparent", L"Transparent Background", 210 },
+    { ID_HIGHLIGHT_HIGH_LOAD_CHECKBOX, L"HighlightHighLoad", L"Red warning over 90%", 235 }
 };
 
 HWND g_changeSettingsWindow = nullptr;
@@ -204,7 +206,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Save",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            50, 245, 60, 25,
+            50, 265, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_SAVE),
             GetModuleHandleW(nullptr),
@@ -215,7 +217,7 @@ LRESULT CALLBACK ChangeSettingsWndProc(HWND hWnd, UINT message, WPARAM wParam, L
             L"BUTTON",
             L"Cancel",
             WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-            180, 245, 60, 25,
+            180, 265, 60, 25,
             hWnd,
             reinterpret_cast<HMENU>(ID_CANCEL),
             GetModuleHandleW(nullptr),
@@ -413,7 +415,7 @@ void OpenChangeSettingsWindow(HWND owner)
 
     // Define the desired dimensions of the settings window.
     const int windowWidth = 295;
-    const int windowHeight = 285;
+    const int windowHeight = 310;
 
     int x = cursorPosition.x;
     int y = cursorPosition.y;

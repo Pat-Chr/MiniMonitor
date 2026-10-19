@@ -55,7 +55,8 @@
                 "ShowGPULine=true\n"
                 "ShowRAMLine=true\n"
                 "ShowVRAMLine=true\n"
-                "bg_transparent=false\n";
+                "bg_transparent=false\n"
+                "HighlightHighLoad=false\n";
             DWORD written = 0;
             SetFilePointer(h, 0, NULL, FILE_BEGIN);
             WriteFile(h, content, (DWORD)strlen(content), &written, NULL);

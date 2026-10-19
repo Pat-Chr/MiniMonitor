@@ -56,6 +56,7 @@ RAM:XX%
 - v1.0.4.3 - Work in progress.
 	- Code cleanup and optimization.
 	- Both settings windows are now dragable.
+	- New option. Turn red if the load is above 90%.
 - v1.0.4.2 - 2026-10-12
 	- Bugfix. The GPU Memory of another iGPU doesn't get added to the overall value anymore.
 	- Background can now be turned to transparent.

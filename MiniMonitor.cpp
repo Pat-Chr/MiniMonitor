@@ -391,14 +391,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 RGB(255, 0, 255), RGB(0, 255, 255), RGB(255, 255, 0),
                 RGB(0, 0, 255), RGB(0, 255, 0), RGB(255, 0, 0), RGB(0, 0, 0), RGB(255, 255, 255)
             };
-            int greatestDistance = -1;
+            const COLORREF protectedTextColors[] = {
+                textColor,
+                RGB(255, 0, 0) // high-load highlight color must never become transparent
+            };
+
+            int bestScore = -1;
             for (COLORREF candidate : candidates) {
-                const int redDistance = static_cast<int>(GetRValue(candidate)) - GetRValue(textColor);
-                const int greenDistance = static_cast<int>(GetGValue(candidate)) - GetGValue(textColor);
-                const int blueDistance = static_cast<int>(GetBValue(candidate)) - GetBValue(textColor);
-                const int distance = redDistance * redDistance + greenDistance * greenDistance + blueDistance * blueDistance;
-                if (distance > greatestDistance) {
-                    greatestDistance = distance;
+                int minDistanceToProtectedColor = 0x7fffffff;
+
+                for (COLORREF protectedColor : protectedTextColors) {
+                    const int redDistance = static_cast<int>(GetRValue(candidate)) - GetRValue(protectedColor);
+                    const int greenDistance = static_cast<int>(GetGValue(candidate)) - GetGValue(protectedColor);
+                    const int blueDistance = static_cast<int>(GetBValue(candidate)) - GetBValue(protectedColor);
+                    const int distance = redDistance * redDistance + greenDistance * greenDistance + blueDistance * blueDistance;
+                    if (distance < minDistanceToProtectedColor) {
+                        minDistanceToProtectedColor = distance;
+                    }
+                }
+
+                if (minDistanceToProtectedColor > bestScore) {
+                    bestScore = minDistanceToProtectedColor;
                     transparentRenderColor = candidate;
                 }
             }
@@ -414,60 +427,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteObject(hBgBrush);
         }
 
-        // Prepare Text (stacked: flexible number of lines)
-        // Add more lines by pushing to 'lines' below
-        std::vector<std::wstring> lines;
-        wchar_t tmp[128];
+		// Prepare text lines and optional high-load highlighting
+		struct RenderLine {
+			std::wstring text;
+			COLORREF color;
+		};
 
-        // Reading the setting if the line should be shown or not.
-        //CPU
-        std::wstring StringShowCPULine = L"true";
-        ReadFromSettings(L"ShowCPULine", StringShowCPULine);
-        bool ShowCPULine = (_wcsicmp(StringShowCPULine.c_str(), L"true") == 0);
-        //GPU
-        std::wstring StringShowGPULine = L"true";
-        ReadFromSettings(L"ShowGPULine", StringShowGPULine);
-        bool ShowGPULine = (_wcsicmp(StringShowGPULine.c_str(), L"true") == 0);
-        //RAM
-        std::wstring StringShowRAMLine = L"true";
-        ReadFromSettings(L"ShowRAMLine", StringShowRAMLine);
-        bool ShowRAMLine = (_wcsicmp(StringShowRAMLine.c_str(), L"true") == 0);
-        //VRAM
-        std::wstring StringShowVRAMLine = L"true";
-        ReadFromSettings(L"ShowVRAMLine", StringShowVRAMLine);
-        bool ShowVRAMLine = (_wcsicmp(StringShowVRAMLine.c_str(), L"true") == 0);
+		std::vector<RenderLine> lines;
+		wchar_t tmp[128];
 
-		// Adding lines one by one, using swprintf_s to format the text
-        // If thhe line is turned off, it will not be drawn.
-        if (ShowCPULine) {
-            swprintf_s(tmp, _countof(tmp), L"CPU:%3.0f%%", cpuLoad);
-            lines.emplace_back(tmp);
-        }
-        if (ShowGPULine) {
-            swprintf_s(tmp, _countof(tmp), L"GPU:%3.0f%%", gpuLoad);
-            lines.emplace_back(tmp);
-        }
-        if (ShowRAMLine) {
-            swprintf_s(tmp, _countof(tmp), L"RAM:%3.0f%%", ramLoad);
-            lines.emplace_back(tmp);
-        }
-        if (ShowVRAMLine) {
-            swprintf_s(tmp, _countof(tmp), L"VRAM:%3.0f%%", gpuRamLoad);
-            lines.emplace_back(tmp);
-        }
+		std::wstring stringHighlightHighLoad = L"false";
+		ReadFromSettings(L"HighlightHighLoad", stringHighlightHighLoad);
+		const bool highlightHighLoad = (_wcsicmp(stringHighlightHighLoad.c_str(), L"true") == 0);
 
-        // Example of adding another line (commented out) — uncomment or add more as needed
-        // swprintf_s(tmp, _countof(tmp), L"RAM:%0.0f%%", ramLoad);
-        // lines.emplace_back(tmp);
+		// Reading the setting if the line should be shown or not.
+		std::wstring StringShowCPULine = L"true";
+		ReadFromSettings(L"ShowCPULine", StringShowCPULine);
+		bool ShowCPULine = (_wcsicmp(StringShowCPULine.c_str(), L"true") == 0);
+
+		std::wstring StringShowGPULine = L"true";
+		ReadFromSettings(L"ShowGPULine", StringShowGPULine);
+		bool ShowGPULine = (_wcsicmp(StringShowGPULine.c_str(), L"true") == 0);
+
+		std::wstring StringShowRAMLine = L"true";
+		ReadFromSettings(L"ShowRAMLine", StringShowRAMLine);
+		bool ShowRAMLine = (_wcsicmp(StringShowRAMLine.c_str(), L"true") == 0);
+
+		std::wstring StringShowVRAMLine = L"true";
+		ReadFromSettings(L"ShowVRAMLine", StringShowVRAMLine);
+		bool ShowVRAMLine = (_wcsicmp(StringShowVRAMLine.c_str(), L"true") == 0);
+
+		const auto addLoadLine = [&](bool shouldShow, const wchar_t* label, float value) {
+			if (!shouldShow) {
+				return;
+			}
+
+			swprintf_s(tmp, _countof(tmp), L"%s:%3.0f%%", label, value);
+			const bool isHighLoad = highlightHighLoad && value > 90.0f;
+			lines.push_back({ tmp, isHighLoad ? RGB(255, 0, 0) : textColor });
+		};
+
+		addLoadLine(ShowCPULine, L"CPU", cpuLoad);
+		addLoadLine(ShowGPULine, L"GPU", gpuLoad);
+		addLoadLine(ShowRAMLine, L"RAM", ramLoad);
+		addLoadLine(ShowVRAMLine, L"VRAM", gpuRamLoad);
 
         // Count how many swprintf_s-produced lines we have
         int count = static_cast<int>(lines.size());
         int swprintfCount = count; // number of swprintf_s calls that produced lines here
 
-        // get the text color from the config file
         if (count > 0)
         {
-            SetTextColor(drawingHdc, textColor);
             if (isTransparent)
                 SetBkMode(drawingHdc, TRANSPARENT);
 
@@ -500,7 +510,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 RECT part = rect;
                 part.top = rect.top + (height * i) / count;
                 part.bottom = rect.top + (height * (i + 1)) / count;
-                DrawTextW(drawingHdc, lines[i].c_str(), -1, &part, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+                SetTextColor(drawingHdc, lines[i].color);
+                DrawTextW(drawingHdc, lines[i].text.c_str(), -1, &part, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
         }
 
@@ -509,39 +520,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             const int backgroundRed = GetRValue(transparentRenderColor);
             const int backgroundGreen = GetGValue(transparentRenderColor);
             const int backgroundBlue = GetBValue(transparentRenderColor);
-            const int foregroundRed = GetRValue(textColor);
-            const int foregroundGreen = GetGValue(textColor);
-            const int foregroundBlue = GetBValue(textColor);
 
             for (int i = 0; i < clientWidth * clientHeight; ++i) {
                 const int sourceBlue = static_cast<int>(pixels[i] & 0xFF);
                 const int sourceGreen = static_cast<int>((pixels[i] >> 8) & 0xFF);
                 const int sourceRed = static_cast<int>((pixels[i] >> 16) & 0xFF);
 
-                double coverage = 0.0;
-                int channelCount = 0;
-                const auto addCoverage = [&coverage, &channelCount](int source, int background, int foreground) {
-                    if (foreground != background) {
-                        double channelCoverage = static_cast<double>(source - background) / (foreground - background);
-                        if (channelCoverage < 0.0) channelCoverage = 0.0;
-                        if (channelCoverage > 1.0) channelCoverage = 1.0;
-                        coverage += channelCoverage;
-                        ++channelCount;
-                    }
-                };
+                const int deltaRed = abs(sourceRed - backgroundRed);
+                const int deltaGreen = abs(sourceGreen - backgroundGreen);
+                const int deltaBlue = abs(sourceBlue - backgroundBlue);
+                int alphaValue = max(deltaRed, max(deltaGreen, deltaBlue));
 
-                addCoverage(sourceRed, backgroundRed, foregroundRed);
-                addCoverage(sourceGreen, backgroundGreen, foregroundGreen);
-                addCoverage(sourceBlue, backgroundBlue, foregroundBlue);
-                coverage = channelCount > 0 ? coverage / channelCount : 0.0;
-
-                int alphaValue = static_cast<int>(coverage * 255.0 + 0.5);
                 if (alphaValue < TRANSPARENT_HIT_ALPHA) alphaValue = TRANSPARENT_HIT_ALPHA;
                 if (alphaValue > 255) alphaValue = 255;
+
                 const BYTE alpha = static_cast<BYTE>(alphaValue);
-                const BYTE red = static_cast<BYTE>((foregroundRed * alpha + 127) / 255);
-                const BYTE green = static_cast<BYTE>((foregroundGreen * alpha + 127) / 255);
-                const BYTE blue = static_cast<BYTE>((foregroundBlue * alpha + 127) / 255);
+                const BYTE red = static_cast<BYTE>((sourceRed * alpha + 127) / 255);
+                const BYTE green = static_cast<BYTE>((sourceGreen * alpha + 127) / 255);
+                const BYTE blue = static_cast<BYTE>((sourceBlue * alpha + 127) / 255);
                 pixels[i] = (static_cast<std::uint32_t>(alpha) << 24) |
                     (static_cast<std::uint32_t>(red) << 16) |
                     (static_cast<std::uint32_t>(green) << 8) | blue;
