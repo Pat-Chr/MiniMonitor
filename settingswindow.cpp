@@ -2,7 +2,7 @@
 // settingswindow.cpp
 // Implements the InfoWndProc window procedure for the Settings Window.
 // Handles WM_CREATE, WM_COMMAND, WM_PAINT, WM_CLOSE, and WM_KEYDOWN messages.
-// Displays current settings and provides buttons to edit/reset/close.
+// Provides buttons to edit/reset/close.
 
 #include <windows.h>
 #include <string>
@@ -71,7 +71,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Edit Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			180, 40, 120, 25,
+			95, 145, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
 			GetModuleHandleW(nullptr),
@@ -82,7 +82,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Reset Settings",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			180, 75, 120, 25,
+			95, 178, 120, 25,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_RESET),
 			GetModuleHandleW(nullptr),
@@ -156,32 +156,22 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
-		// Read the current settings for display
-		std::wstring wColor;
-		ReadFromSettings(L"text_color", wColor);
-		std::wstring wBgColor;
-		ReadFromSettings(L"bg_color", wBgColor);
-
-		// Build the help text and append the currently active settings.
+		// Build the help text.
 		std::wstring info =
-			L"\n\n\n\n\n\nControls:\n"
+			L"MiniMonitor Version: ";
+		info += GetProgramVersion();
+		info += L"\n\nControls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
-			L"____________\n\nCurrent settings:\n";
-
-		info += L"\nText Color: ";
-		info += wColor;
-		info += L"\nBackground Color: ";
-		info += wBgColor;
-		info += L"\n____________";
-		info += L"\n\n\nMiniMonitor Version: ";
-		info += GetProgramVersion();
+			L"____________";
 
 		// Draw the text with word wrapping inside the client area.
 		RECT drawRect;
 		GetClientRect(hWnd, &drawRect);
-		drawRect.left += 10; // Linker Randabstand
+		drawRect.left += 10;
+		drawRect.top += 10;
+		drawRect.bottom -= 70;
 
 		DrawTextW(
 			hdc,
