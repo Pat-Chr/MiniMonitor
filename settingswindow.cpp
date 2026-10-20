@@ -197,8 +197,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"Controls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
-			L" - Right click: open this window (settings)\n"
-			L"____________";
+			L" - Right click: open this window (settings)\n\n";
 
 		// Draw the text with word wrapping inside the client area.
 		RECT drawRect;
