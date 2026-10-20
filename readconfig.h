@@ -5,5 +5,8 @@
 // std::wstring wBgColor;
 // ReadFromSettings(L"bg_color", wBgColor);
 #pragma once
+
+#include <string>
+
 void EnsureConfigFileExists();
 void ReadFromSettings(const std::wstring& SettingName, std::wstring& SettingValue);

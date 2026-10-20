@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <winver.h>
+#include <shellapi.h>
 
 #include "resource.h" // Instead of "resource_ids.h"
 #include "readconfig.h"
@@ -17,14 +18,20 @@
 
 namespace
 {
+	constexpr wchar_t kProjectUrl[] = L"https://github.com/Pat-Chr/MiniMonitor";
+
 	// Tracks the settings window instance managed by the application.
 	HWND g_changeSettingsWindow = nullptr;
 
 	// Flag to track if dragging is active
 	bool g_isDragging = false;
-	
+
 	// Store original mouse position for drag offset
 	POINT g_dragOffset = { 0, 0 };
+
+	// Clickable bounds for the project URL in the help text.
+	RECT g_linkRect = { 0, 0, 0, 0 };
+	bool g_hasLinkRect = false;
 }
 
 // Retrieves the file version embedded in the running executable.
@@ -180,11 +187,14 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		SetTextColor(hdc, RGB(0, 255, 0));
 		SetBkMode(hdc, TRANSPARENT);
 
+		const std::wstring versionLine = L"MiniMonitor Version: " + GetProgramVersion();
+
 		// Build the help text.
-		std::wstring info =
-			L"MiniMonitor Version: ";
-		info += GetProgramVersion();
-		info += L"\n\nControls:\n"
+		std::wstring info = versionLine;
+		info += L"\n";
+		info += kProjectUrl;
+		info += L"\n\n"
+			L"Controls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
 			L" - Double click: close window\n"
 			L" - Right click: open this window (settings)\n"
@@ -203,6 +213,18 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			-1,
 			&drawRect,
 			DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_EXPANDTABS);
+
+		TEXTMETRICW metrics{};
+		GetTextMetricsW(hdc, &metrics);
+		const int lineHeight = metrics.tmHeight + metrics.tmExternalLeading;
+
+		SIZE urlSize{};
+		GetTextExtentPoint32W(hdc, kProjectUrl, lstrlenW(kProjectUrl), &urlSize);
+		g_linkRect.left = drawRect.left;
+		g_linkRect.top = drawRect.top + lineHeight;
+		g_linkRect.right = g_linkRect.left + urlSize.cx;
+		g_linkRect.bottom = g_linkRect.top + lineHeight;
+		g_hasLinkRect = true;
 
 		EndPaint(hWnd, &ps);
 		return 0;
@@ -231,17 +253,42 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		return 0;
 
 	case WM_LBUTTONDOWN:
+	{
+		POINT clickPoint = { LOWORD(lParam), HIWORD(lParam) };
+		if (g_hasLinkRect && PtInRect(&g_linkRect, clickPoint))
+		{
+			ShellExecuteW(hWnd, L"open", kProjectUrl, nullptr, nullptr, SW_SHOWNORMAL);
+			return 0;
+		}
+
 		// Handle drag when clicking anywhere in the client area.
 		g_isDragging = true;
-		{
-			RECT windowRect2;
-			GetWindowRect(hWnd, &windowRect2);
-			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
-			ClientToScreen(hWnd, &pt);
-			g_dragOffset.x = pt.x - windowRect2.left;
-			g_dragOffset.y = pt.y - windowRect2.top;
-		}
+		RECT windowRect2;
+		GetWindowRect(hWnd, &windowRect2);
+		POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+		ClientToScreen(hWnd, &pt);
+		g_dragOffset.x = pt.x - windowRect2.left;
+		g_dragOffset.y = pt.y - windowRect2.top;
 		return 0;
+	}
+
+	case WM_SETCURSOR:
+		if (LOWORD(lParam) == HTCLIENT)
+		{
+			POINT cursorPos;
+			GetCursorPos(&cursorPos);
+			ScreenToClient(hWnd, &cursorPos);
+			if (!g_isDragging && g_hasLinkRect && PtInRect(&g_linkRect, cursorPos))
+			{
+				SetCursor(LoadCursorW(nullptr, IDC_HAND));
+			}
+			else
+			{
+				SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+			}
+			return TRUE;
+		}
+		break;
 
 	case WM_MOUSEMOVE:
 		if (g_isDragging)
@@ -272,5 +319,3 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	}
 }
 
-// Constants for the window's buttons
-#define ID_CHANGE_SETTINGS_CLOSE 1001;

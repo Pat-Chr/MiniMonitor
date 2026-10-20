@@ -5,7 +5,6 @@
 
 #include <windows.h>
 #include <string>
-#include <winver.h>
 #include <commdlg.h>
 #include <cstring>
 #include <cwchar>

@@ -53,7 +53,7 @@ RAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
-- v1.0.4.3 - Work in progress.
+- v1.0.5.0 - 2026-10-20
 	- Code cleanup and optimization.
 	- Both settings windows are now dragable.
 	- New option. Turn red if the load is above 90%.
