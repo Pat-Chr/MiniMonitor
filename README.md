@@ -24,6 +24,7 @@ The widget displays current utilization in a stacked format:
 CPU:XX%
 GPU:XX%
 RAM:XX%
+VRAM:XX%
 ```
 
 ## 🖱️ Controls
