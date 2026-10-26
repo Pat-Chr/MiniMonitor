@@ -54,6 +54,8 @@ VRAM:XX%
 5. Run the generated `.exe` from the output folder (e.g., `x64/Release/`).
 
 ## 🗒️ Changelog
+- v1.0.5.1 Work in progress
+	- Button to close MiniMonitor in the info/settings menu.
 - v1.0.5.0 - 2026-10-20
 	- Code cleanup and optimization.
 	- Both settings windows are now dragable.

@@ -16,6 +16,8 @@
 
 #pragma comment(lib, "Version.lib")
 
+extern HWND g_mainWindow;
+
 namespace
 {
 	constexpr wchar_t kProjectUrl[] = L"https://github.com/Pat-Chr/MiniMonitor";
@@ -78,7 +80,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Edit Settings",
 			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-			95, 145, 120, 25,
+			95, 145, 140, 22,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS),
 			GetModuleHandleW(nullptr),
@@ -89,9 +91,20 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			L"BUTTON",
 			L"Reset Settings",
 			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
-			95, 178, 120, 25,
+			95, 170, 140, 22,
 			hWnd,
 			reinterpret_cast<HMENU>(ID_CHANGE_SETTINGS_RESET),
+			GetModuleHandleW(nullptr),
+			nullptr);
+
+		// Create the button used to close the entire MiniMonitor application.
+		CreateWindowW(
+			L"BUTTON",
+			L"Close MiniMonitor",
+			WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
+			95, 195, 140, 22,
+			hWnd,
+			reinterpret_cast<HMENU>(ID_CLOSE_MINIMONITOR),
 			GetModuleHandleW(nullptr),
 			nullptr);
 
@@ -162,6 +175,18 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 				break;
 
+			case ID_CLOSE_MINIMONITOR:
+				// Close the entire application when the close button is clicked.
+				if (g_mainWindow != nullptr && IsWindow(g_mainWindow))
+				{
+					DestroyWindow(g_mainWindow);
+				}
+				else
+				{
+					PostQuitMessage(0);
+				}
+				break;
+
 			case ID_CHANGE_SETTINGS_CLOSE:
 				// Close the window when the close button is clicked.
 				DestroyWindow(hWnd);
@@ -196,7 +221,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		info += L"\n\n"
 			L"Controls:\n"
 			L" - Drag window: Hold SHIFT and click & drag\n"
-			L" - Double click: close window\n"
+			L" - Double click: close MiniMonitor\n"
 			L" - Right click: open this window (settings)\n\n";
 
 		// Draw the text with word wrapping inside the client area.
@@ -204,7 +229,7 @@ LRESULT CALLBACK InfoWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		GetClientRect(hWnd, &drawRect);
 		drawRect.left += 10;
 		drawRect.top += 10;
-		drawRect.bottom -= 70;
+		drawRect.bottom -= 90;
 
 		DrawTextW(
 			hdc,
